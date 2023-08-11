@@ -35,11 +35,11 @@ The Automated script is used to migrate applications from HANA CDS to CAP CDS. I
 ## Usage:
 1. Clone the git repository.
     ```
-    git clone https://github.tools.sap/BTP-E2EScenarioValidation/xsa-to-cap-hanacloud.git
+    git clone https://github.com/SAP-samples/xsa-cap-migration.git
     ```
 2. Navigate to the script folder.
    ```
-   cd xsa-to-cap-migration
+   cd migration-script
    ```
 3. Install the required node modules by running the command `npm install`.
 4. Execute the script by running the command `npm run start`.
@@ -58,7 +58,7 @@ The Automated script is used to migrate applications from HANA CDS to CAP CDS. I
 - The rename can be called for different Hana Artifacts. List the file extensions in the "config.json.tpl" file.
   
   **Note:** It doesnt work on hdbrole as it also renames the keywords. So if a new artifact other than the given list is added here, make sure to check if the rename is done correctly before deployment.
-- For Multiple containers, mta.yaml has to be updated with service replacements. Example: [mta.yaml](https://github.tools.sap/BTP-E2EScenarioValidation/shine-cap/blob/master/mta.yaml#L48-L56)
+- For Multiple containers, mta.yaml has to be updated with service replacements. Example: [mta.yaml](https://github.com/SAP-samples/xsa-cap-migration/blob/main/hana-shine-cap/mta.yaml#L48-L56)
 
 ## License
 Copyright (c) 2023 SAP SE or an SAP affiliate company. All rights reserved.

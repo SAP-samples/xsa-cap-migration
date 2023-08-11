@@ -21,7 +21,7 @@ If sap-registry is set in your system please delete by using below command.
     `npm config delete "@sap:registry"`
 >Note: Minimum version to run the application is CDS : 7.x.x
 * Install the following:
-  1. cds    - `npm install -g @sap/cds` `npm install -g @sap/cds-dk`
+  1. cds    - `npm install -g @sap/cds` & `npm install -g @sap/cds-dk`
   2. [multiapps plugin](https://github.com/cloudfoundry-incubator/multiapps-cli-plugin) - `cf install-plugin multiapps`  
   3. mbt         -  `npm install -g mbt`
 
