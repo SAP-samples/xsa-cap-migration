@@ -1,5 +1,5 @@
 # XS Advanced Programming Model To SAP Cloud Application Programming Model Migration Guide : Manual
-===================================
+
 This article describes the process to Manually migrate an application's data stored in containers created by the SAP HANA deployment infrastructure (HDI) to SAP HANA Cloud.
 
 **Note:** [The Self-Service Migration Tool for SAP HANA Cloud](https://help.sap.com/docs/hana-cloud/sap-hana-cloud-migration-guide/self-service-migration-for-sap-hana-cloud-tool?locale=en-US) will list out all of the issues/incompatibilities in the source application during migration. But if we opt for the manual approach, we ourself should be aware of the changes to be made in the source application before the migration.
