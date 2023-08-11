@@ -74,6 +74,7 @@ The first step of the migration is to clone and deploy the Source Application.
   ```
     git clone https://github.com/SAP-samples/hana-shine-xsa.git
   ```
+- Follow the Steps Before Building the Application [SHINE](https://github.com/SAP-samples/hana-shine-xsa/blob/main/SHINE-XSA.md)
 - Build the application
   ```
     mbt build -p=cf
