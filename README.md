@@ -387,7 +387,7 @@ Migrate the SRV and the UI layer of the XSA Application to CAP.
 5. [Migration Guidance for Incompatible Features](https://help.sap.com/docs/hana-cloud/sap-hana-cloud-migration-guide/checks-performed-by-migration-tool).
 6. [Compatibility with Other SAP HANA Products](https://help.sap.com/docs/hana-cloud/sap-hana-cloud-migration-guide/compatibility-with-other-sap-hana-versions).
 7. [The Self-Service Migration Tool for SAP HANA Cloud](https://help.sap.com/docs/hana-cloud/sap-hana-cloud-migration-guide/self-service-migration-for-sap-hana-cloud-tool?locale=en-US).
-8. [Manual Migration of XSA to CAP](https://github.com/SAP-samples/xsa-cap-migration/blob/main/hana-shine-cap/examples/ManualMigration.md).
+8. [Manual Migration of XSA to CAP](https://github.com/SAP-samples/xsa-cap-migration/blob/main/examples/ManualMigration.md).
 9. [SAPUI5](https://sapui5.hana.ondemand.com/#/topic).
 10. [Fiori Elements](https://sapui5.hana.ondemand.com/sdk/#/topic/03265b0408e2432c9571d6b3feb6b1fd).
 11. [Partition a table in HANA Deployment Infrastructure(HDI)](https://blogs.sap.com/2022/01/11/partition-a-table-in-hana-deployment-infrastructurehdi/)
