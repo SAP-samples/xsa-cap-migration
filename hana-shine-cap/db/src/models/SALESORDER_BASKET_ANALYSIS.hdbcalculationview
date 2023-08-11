@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Calculation:scenario xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Calculation="http://www.sap.com/ndb/BiModelCalculation.ecore" id="SAP_HANA_DEMOCONTENT_EPM_MODELS_SALESORDER_BASKET_ANALYSIS" applyPrivilegeType="NONE" dataCategory="CUBE" dimensionType="" schemaVersion="3.0" defaultClient="$$client$$" outputViewType="Aggregation" calculationScenarioType="TREE_BASED" enforceSqlExecution="false">
+<descriptions defaultDescription="SALESORDER_BASKET_ANALYSIS"/>
+<localVariables/>
+<variableMappings/>
+<dataSources>
+  <DataSource id="SO_HEADER">
+    <resourceUri>SO_HEADER</resourceUri>
+  </DataSource>
+  <DataSource id="SO_ITEM">
+    <resourceUri>SO_ITEM</resourceUri>
+  </DataSource>
+  <DataSource id="MD_PRODUCTS">
+    <resourceUri>MD_PRODUCTS</resourceUri>
+  </DataSource>
+</dataSources>
+<calculationViews>
+  <calculationView xsi:type="Calculation:JoinView" id="Join_1" joinType="inner">
+    <viewAttributes>
+      <viewAttribute id="SALESORDERID"><descriptions/>
+        <descriptions defaultDescription="SALESORDERID"/>
+      </viewAttribute>
+      <viewAttribute id="HISTORY_CREATEDAT"><descriptions/>
+        <descriptions defaultDescription="HISTORY_CREATEDAT"/>
+      </viewAttribute>
+      <viewAttribute id="NETAMOUNT"><descriptions/>
+        <descriptions defaultDescription="NETAMOUNT"/>
+      </viewAttribute>
+      <viewAttribute id="SALESORDERITEM"><descriptions/>
+        <descriptions defaultDescription="SALESORDERITEM"/>
+      </viewAttribute>
+      <viewAttribute id="PRODUCTID"><descriptions/>
+        <descriptions defaultDescription="PRODUCT_PRODUCTID"/>
+      </viewAttribute>
+    </viewAttributes>
+    <calculatedViewAttributes/>
+    <input node="SO_HEADER">
+      <mapping xsi:type="Calculation:AttributeMapping" target="SALESORDERID" source="SALESORDERID"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="HISTORY_CREATEDAT" source="HISTORY_CREATEDAT"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="NETAMOUNT" source="NETAMOUNT"/>
+    </input>
+    <input node="SO_ITEM">
+      <mapping xsi:type="Calculation:AttributeMapping" target="SALESORDERITEM" source="SALESORDERITEM"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="PRODUCTID" source="PRODUCT_PRODUCTID"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="SALESORDERID" source="SALESORDERID"/>
+    </input>
+    <joinAttribute name="SALESORDERID"/>
+  </calculationView>
+  <calculationView xsi:type="Calculation:JoinView" id="Join_2" joinType="inner">
+    <viewAttributes>
+      <viewAttribute id="CATEGORY"><descriptions/>
+        <descriptions defaultDescription="CATEGORY"/>
+      </viewAttribute>
+      <viewAttribute id="PRODUCTID"><descriptions/>
+        <descriptions defaultDescription="PRODUCTID"/>
+      </viewAttribute>
+      <viewAttribute id="SALESORDERITEM"><descriptions/>
+        <descriptions defaultDescription="SALESORDERITEM"/>
+      </viewAttribute>
+      <viewAttribute id="NETAMOUNT"><descriptions/>
+        <descriptions defaultDescription="NETAMOUNT"/>
+      </viewAttribute>
+      <viewAttribute id="HISTORY_CREATEDAT"><descriptions/>
+        <descriptions defaultDescription="HISTORY_CREATEDAT"/>
+      </viewAttribute>
+      <viewAttribute id="SALESORDERID"><descriptions/>
+        <descriptions defaultDescription="SALESORDERID"/>
+      </viewAttribute>
+    </viewAttributes>
+    <calculatedViewAttributes/>
+    <input node="Join_1">
+      <mapping xsi:type="Calculation:AttributeMapping" target="PRODUCTID" source="PRODUCTID"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="SALESORDERITEM" source="SALESORDERITEM"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="NETAMOUNT" source="NETAMOUNT"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="HISTORY_CREATEDAT" source="HISTORY_CREATEDAT"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="SALESORDERID" source="SALESORDERID"/>
+    </input>
+    <input node="MD_PRODUCTS">
+      <mapping xsi:type="Calculation:AttributeMapping" target="CATEGORY" source="CATEGORY"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="PRODUCTID" source="PRODUCTID"/>
+    </input>
+    <joinAttribute name="PRODUCTID"/>
+  </calculationView>
+  <calculationView xsi:type="Calculation:AggregationView" id="AGGREGATION_1">
+    <viewAttributes>
+      <viewAttribute id="CATEGORY"><descriptions/>
+        <descriptions defaultDescription="CATEGORY"/>
+      </viewAttribute>
+      <viewAttribute id="SALESORDERITEM"><descriptions/>
+        <descriptions defaultDescription="SALESORDERITEM"/>
+      </viewAttribute>
+      <viewAttribute id="NETAMOUNT"><descriptions/>
+        <descriptions defaultDescription="NETAMOUNT"/>
+      </viewAttribute>
+      <viewAttribute id="HISTORY_CREATEDAT"><descriptions/>
+        <descriptions defaultDescription="HISTORY_CREATEDAT"/>
+      </viewAttribute>
+      <viewAttribute id="SALESORDERID"><descriptions/>
+        <descriptions defaultDescription="SALESORDERID"/>
+      </viewAttribute>
+    </viewAttributes>
+    <calculatedViewAttributes/>
+    <input node="Join_2">
+      <mapping xsi:type="Calculation:AttributeMapping" target="CATEGORY" source="CATEGORY"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="SALESORDERITEM" source="SALESORDERITEM"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="NETAMOUNT" source="NETAMOUNT"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="HISTORY_CREATEDAT" source="HISTORY_CREATEDAT"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="SALESORDERID" source="SALESORDERID"/>
+    </input>
+  </calculationView>
+</calculationViews>
+<logicalModel id="AGGREGATION_1">
+  <attributes>
+    <attribute id="SALESORDERID" order="1" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="SALESORDERID"/>
+      <keyMapping columnObjectName="AGGREGATION_1" columnName="SALESORDERID"/>
+    </attribute>
+    <attribute id="HISTORY_CREATEDAT" order="2" semanticType="empty" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="HISTORY_CREATEDAT"/>
+      <keyMapping columnObjectName="AGGREGATION_1" columnName="HISTORY_CREATEDAT"/>
+    </attribute>
+    <attribute id="SALESORDERITEM" order="3" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="SALESORDERITEM"/>
+      <keyMapping columnObjectName="AGGREGATION_1" columnName="SALESORDERITEM"/>
+    </attribute>
+    <attribute id="CATEGORY" order="4" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="CATEGORY"/>
+      <keyMapping columnObjectName="AGGREGATION_1" columnName="CATEGORY"/>
+    </attribute>
+  </attributes>
+  <calculatedAttributes/>
+  <baseMeasures>
+    <measure id="NETAMOUNT" order="5" aggregationType="sum" measureType="simple" restrictionExpressionLanguage="SQL">
+      <descriptions defaultDescription="NETAMOUNT"/>
+      <measureMapping columnObjectName="AGGREGATION_1" columnName="NETAMOUNT"/>
+    </measure>
+  </baseMeasures>
+  <calculatedMeasures>
+    <measure id="COUNTER" hidden="true" order="6" aggregationType="sum" measureType="simple" calculatedMeasureType="counter" aggregatable="true" datatype="INTEGER" restrictionExpressionLanguage="SQL">
+      <descriptions defaultDescription="COUNTER"/>
+      <exceptionAggregation>
+        <attribute attributeName="SALESORDERITEM"/>
+        <attribute attributeName="CATEGORY"/>
+      </exceptionAggregation>
+      <formula>1</formula>
+      </measure>
+    <measure id="SALES" hidden="false" order="7" aggregationType="sum" measureType="simple" datatype="DECIMAL" length="12" scale="2" restrictionExpressionLanguage="SQL">
+      <descriptions defaultDescription="SALES"/>
+      <formula>&quot;NETAMOUNT&quot;/&quot;COUNTER&quot;</formula>
+      </measure>
+  </calculatedMeasures>
+  <restrictedMeasures/>
+  <localDimensions/>
+</logicalModel>
+<layout>
+  <shapes>
+    <shape expanded="true" modelObjectName="Output" modelObjectNameSpace="MeasureGroup">
+      <upperLeftCorner x="40" y="85"/>
+    </shape>
+  
+    <shape expanded="true" modelObjectName="Join_1" modelObjectNameSpace="CalculationView">
+      <upperLeftCorner x="56" y="423"/>
+      <rectangleSize height="30" width="140"/>
+    </shape>
+    <shape modelObjectName="SO_HEADER" modelObjectNameSpace="Join_1" modelObjectType="JoinNodeInput">
+      <upperLeftCorner x="20" y="34"/>
+      <rectangleSize width="266"/>
+    </shape>
+    <shape modelObjectName="SO_ITEM" modelObjectNameSpace="Join_1" modelObjectType="JoinNodeInput">
+      <upperLeftCorner x="320" y="30"/>
+      <rectangleSize width="250"/>
+    </shape>
+    <shape expanded="true" modelObjectName="Join_2" modelObjectNameSpace="CalculationView">
+      <upperLeftCorner x="56" y="304"/>
+      <rectangleSize height="30" width="140"/>
+    </shape>
+    <shape modelObjectName="Join_1" modelObjectNameSpace="Join_2" modelObjectType="JoinNodeInput">
+      <upperLeftCorner x="20" y="30"/>
+      <rectangleSize width="250"/>
+    </shape>
+    <shape modelObjectName="MD_PRODUCTS" modelObjectNameSpace="Join_2" modelObjectType="JoinNodeInput">
+      <upperLeftCorner x="320" y="34"/>
+      <rectangleSize width="266"/>
+    </shape>
+    <shape expanded="true" modelObjectName="AGGREGATION_1" modelObjectNameSpace="CalculationView">
+      <upperLeftCorner x="196" y="165"/>
+      <rectangleSize height="30" width="140"/>
+    </shape>
+  </shapes>
+</layout>
+</Calculation:scenario>

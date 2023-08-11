@@ -1,0 +1,14 @@
+PROCEDURE "GET_PRODUCTS_BY_FILTER" (
+	IN im_filter_string VARCHAR(5000), 
+    out ex_products "MD_PRODUCTS" )
+   LANGUAGE SQLSCRIPT
+   SQL SECURITY INVOKER
+   --DEFAULT SCHEMA <default_schema_name>
+   READS SQL DATA AS
+BEGIN
+   /*************************************
+       Write your procedure logic 
+   *************************************/
+   ex_products = APPLY_FILTER("MD_PRODUCTS", :im_filter_string) ; 
+   
+END

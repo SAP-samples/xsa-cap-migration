@@ -1,0 +1,17 @@
+PROCEDURE "GET_APPLICATION_VARIABLES" ( 
+	IN im_application NVARCHAR(128), 
+	OUT ex_svariable "PROCEDURES_TT_VARIABLE")
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER 
+	--DEFAULT SCHEMA <default_schema_name>
+	READS SQL DATA AS
+BEGIN
+/***************************** 
+	Write your procedure logic 
+ *****************************/
+    ex_svariable = 
+      SELECT SESSIONID, NAME, APPLICATION, EXPIRY, DATA 
+ 	    FROM "UTIL_SSCOOKIE"
+	   WHERE APPLICATION = :im_application
+	     and SESSIONID = ''; 
+END;

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Calculation:scenario xmlns:Calculation="http://www.sap.com/ndb/BiModelCalculation.ecore" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" schemaVersion="2.3" id="SAP_HANA_DEMOCONTENT_EPM_MODELS_SALES_DETAILS" defaultClient="$$client$$" defaultLanguage="$$language$$" visibility="internal" calculationScenarioType="TREE_BASED" dataCategory="DEFAULT" enforceSqlExecution="false" executionSemantic="UNDEFINED" outputViewType="Aggregation">
+  <origin/>
+  <descriptions defaultDescription="SALES_DETAILS"/>
+  <metadata changedAt="2015-04-24 16:05:08.851"/>
+  <localVariables/>
+  <variableMappings/>
+  <dataSources>
+    <DataSource id="SO_HEADER" type="DATA_BASE_TABLE">
+      <resourceUri>SO_HEADER</resourceUri>
+    </DataSource>
+    <DataSource id="SO_ITEM" type="DATA_BASE_TABLE">
+      <resourceUri>SO_ITEM</resourceUri>
+    </DataSource>
+    <DataSource id="MD_PRODUCTS" type="DATA_BASE_TABLE">
+      <resourceUri>MD_PRODUCTS</resourceUri>
+    </DataSource>
+  </dataSources>
+  <calculationViews>
+    <calculationView xsi:type="Calculation:JoinView" id="Join_1" joinType="inner">
+      <viewAttributes>
+        <viewAttribute id="SALESORDERID"/>
+        <viewAttribute id="HISTORY_CREATEDAT"/>
+        <viewAttribute id="NETAMOUNT"/>
+        <viewAttribute id="SALESORDERITEM"/>
+        <viewAttribute id="PRODUCTID"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <input node="#SO_HEADER">
+        <mapping xsi:type="Calculation:AttributeMapping" target="SALESORDERID" source="SALESORDERID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="HISTORY_CREATEDAT" source="HISTORY_CREATEDAT"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="NETAMOUNT" source="NETAMOUNT"/>
+      </input>
+      <input node="#SO_ITEM">
+        <mapping xsi:type="Calculation:AttributeMapping" target="SALESORDERITEM" source="SALESORDERITEM"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="PRODUCTID" source="PRODUCT_PRODUCTID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="SALESORDERID" source="SALESORDERID"/>
+      </input>
+      <joinAttribute name="SALESORDERID"/>
+    </calculationView>
+    <calculationView xsi:type="Calculation:JoinView" id="Join_2" joinType="inner">
+      <viewAttributes>
+        <viewAttribute id="PRODUCTID"/>
+        <viewAttribute id="SALESORDERITEM"/>
+        <viewAttribute id="NETAMOUNT"/>
+        <viewAttribute id="HISTORY_CREATEDAT"/>
+        <viewAttribute id="SALESORDERID"/>
+        <viewAttribute id="CATEGORY"/>
+      </viewAttributes>
+      <calculatedViewAttributes/>
+      <input node="#Join_1">
+        <mapping xsi:type="Calculation:AttributeMapping" target="PRODUCTID" source="PRODUCTID"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="SALESORDERITEM" source="SALESORDERITEM"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="NETAMOUNT" source="NETAMOUNT"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="HISTORY_CREATEDAT" source="HISTORY_CREATEDAT"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="SALESORDERID" source="SALESORDERID"/>
+      </input>
+      <input node="#MD_PRODUCTS">
+        <mapping xsi:type="Calculation:AttributeMapping" target="CATEGORY" source="CATEGORY"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="PRODUCTID" source="PRODUCTID"/>
+      </input>
+      <joinAttribute name="PRODUCTID"/>
+    </calculationView>
+  </calculationViews>
+  <logicalModel id="Join_2">
+    <attributes>
+      <attribute id="SALESORDERITEM" key="true" order="1" attributeHierarchyActive="false" displayAttribute="false">
+        <descriptions defaultDescription="SALESORDERITEM"/>
+        <keyMapping columnObjectName="Join_2" columnName="SALESORDERITEM"/>
+      </attribute>
+      <attribute id="HISTORY_CREATEDAT" order="2" attributeHierarchyActive="false" displayAttribute="false">
+        <descriptions defaultDescription="HISTORY_CREATEDAT"/>
+        <keyMapping columnObjectName="Join_2" columnName="HISTORY_CREATEDAT"/>
+      </attribute>
+      <attribute id="SALESORDERID" key="true" order="3" attributeHierarchyActive="false" displayAttribute="false">
+        <descriptions defaultDescription="SALESORDERID"/>
+        <keyMapping columnObjectName="Join_2" columnName="SALESORDERID"/>
+      </attribute>
+      <attribute id="CATEGORY" order="4" attributeHierarchyActive="false" displayAttribute="false">
+        <descriptions defaultDescription="CATEGORY"/>
+        <keyMapping columnObjectName="Join_2" columnName="CATEGORY"/>
+      </attribute>
+    </attributes>
+    <calculatedAttributes/>
+    <privateDataFoundation>
+      <tableProxies/>
+      <joins/>
+      <layout>
+        <shapes/>
+      </layout>
+    </privateDataFoundation>
+    <baseMeasures/>
+    <calculatedMeasures/>
+    <restrictedMeasures/>
+    <localDimensions/>
+  </logicalModel>
+  <layout>
+    <shapes>
+      <shape expanded="true" modelObjectName="Output" modelObjectNameSpace="MeasureGroup">
+        <upperLeftCorner x="40" y="85"/>
+        <rectangleSize/>
+      </shape>
+      <shape expanded="true" modelObjectName="Join_1" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="40" y="330"/>
+        <rectangleSize height="-1" width="-1"/>
+      </shape>
+      <shape expanded="true" modelObjectName="Join_2" modelObjectNameSpace="CalculationView">
+        <upperLeftCorner x="30" y="220"/>
+        <rectangleSize height="-1" width="-1"/>
+      </shape>
+    </shapes>
+  </layout>
+</Calculation:scenario>

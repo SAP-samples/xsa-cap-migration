@@ -1,0 +1,95 @@
+_schema-version: '3.1'
+ID: hana-shine-cap
+version: 1.0.0
+description: "A sample application that demonstrates the migration of XSA-based application to SAP Cloud Application Programming model and Hana Cloud"
+parameters:
+  enable-parallel-deployments: true
+build-parameters:
+  before-all:
+    - builder: custom
+      commands:
+        - npm install
+        - npx -p @sap/cds-dk cds build --production
+modules:
+  - name: shine-srv
+    type: nodejs
+    path: gen/srv
+    parameters:
+      buildpack: nodejs_buildpack
+    build-parameters:
+      builder: npm-ci
+    requires:
+      - name: shine-cap-container-db
+      - name: shine-scheduler
+      - name: shine_uaa
+    provides:
+      - name: shinejs_api
+        properties:
+          service_url: '${default-url}'
+  - name: shine-ui
+    type: html5
+    path: app
+    requires:
+      - name: shine_uaa
+      - name: shinejs_api
+        group: destinations
+        properties:
+          name: shinejs_be
+          url: '~{service_url}'
+          forwardAuthToken: true
+
+  - name: shine-db-deployer
+    type: hdb
+    path: gen/db
+    deployed-after:
+      - shine-db-user-deployer
+    parameters:
+      buildpack: nodejs_buildpack
+    requires:
+      - name: shine-cap-container-db
+        properties:
+          TARGET_CONTAINER: ~{hdi-container-name}
+      - name: shine-cap-container-user
+        group: SERVICE_REPLACEMENTS
+        properties:
+          key: hdi-user-service
+          service: ~{the-service-name}
+  - name: shine-db-user-deployer
+    type: hdb
+    path: gen/user-db
+    parameters:
+      buildpack: nodejs_buildpack
+    requires:
+      - name: shine-cap-container-user
+resources:
+  - name: shine-cap-container-user
+    type: com.sap.xs.hdi-container
+    parameters:
+      service: hana
+      service-name: shine-cap-container-user
+      service-plan: hdi-shared
+    properties:
+      the-service-name: ${service-name}
+  - name: shine-cap-container-db
+    type: com.sap.xs.hdi-container
+    parameters:
+      service: hana
+      service-plan: hdi-shared
+    properties:
+      hdi-container-name: ${service-name}
+  - name: shine_uaa
+    type: com.sap.xs.uaa
+    parameters:
+      service: xsuaa
+      service-plan: application
+      path: ./xs-security.json
+      config:
+        xsappname: shine-${space}
+        tenant-mode: dedicated 
+  - name: shine-scheduler
+    type: com.sap.xs.job-scheduler
+    parameters:
+      service: jobscheduler
+      service-plan: standard
+      config:
+       enable-xsuaa-support: true

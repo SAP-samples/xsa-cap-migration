@@ -1,0 +1,22 @@
+{
+    "welcomeFile": "launchpad/index.html",
+    "authenticationMethod": "route",
+    "routes": [{
+            "source": "^/shine/(.*)$",
+            "target": "/shine/$1",
+            "destination": "shinejs_be",
+            "authenticationType": "xsuaa"
+        },
+        {
+            "source": "^/v2/shine/(.*)$",
+            "target": "/v2/shine/$1",
+            "destination": "shinejs_be",
+            "authenticationType": "xsuaa"
+        },
+        {
+            "source": "^/(.*)$",
+            "localDir": "resources",
+            "scope": "$XSAPPNAME.view"
+        }
+    ]
+}

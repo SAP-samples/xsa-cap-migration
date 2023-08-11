@@ -1,0 +1,15 @@
+<sap.ui.core.mvc:View controllerName="sap.hana.democontent.epm.admin.view.App"
+    xmlns:sap.ui.unified="sap.ui.unified"
+    xmlns:sap.ui.core.mvc="sap.ui.core.mvc" >
+    <sap.ui.unified:Shell icon="images/sap_18.png" showPane="false" showCurtain="false" showCurtainPane="false" headerHiding="false">
+        <sap.ui.unified:content>
+            <sap.ui.core.mvc:XMLView id="default" viewName="sap.hana.democontent.epm.admin.view.default"></sap.ui.core.mvc:XMLView>
+        </sap.ui.unified:content>
+        <sap.ui.unified:headItems>
+            <sap.ui.unified:ShellHeadItem icon="sap-icon://home" tooltip="Home" press="handlePressHome"></sap.ui.unified:ShellHeadItem>
+        </sap.ui.unified:headItems>
+        <sap.ui.unified:user>
+            <sap.ui.unified:ShellHeadUserItem username="{config>/UserName}" image="sap-icon://person-placeholder"></sap.ui.unified:ShellHeadUserItem>
+        </sap.ui.unified:user>
+    </sap.ui.unified:Shell>
+</sap.ui.core.mvc:View>

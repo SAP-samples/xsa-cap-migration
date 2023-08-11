@@ -1,0 +1,52 @@
+{
+  "role": {
+    "name": "userG#",
+    "schema_privileges": [
+      {
+        "privileges": [
+          "SELECT METADATA",
+          "SELECT CDS METADATA",
+          "SELECT",
+          "INSERT",
+          "UPDATE",
+          "EXECUTE",
+          "DELETE",
+          "CREATE TEMPORARY TABLE",
+          "CREATE ANY",
+          "CREATE OBJECT STRUCTURED PRIVILEGE"
+        ],
+        "privileges_with_grant_option": [
+          "CREATE ANY",
+          "EXECUTE",
+          "INSERT",
+          "SELECT",
+          "SELECT CDS METADATA",
+          "SELECT METADATA",
+          "UPDATE"
+        ]
+      }
+    ],
+          "object_privileges": [
+      {
+        "name": "PROCEDURES_USERSCREATEMETHOD",
+        "type": "PROCEDURE",
+        "privileges": [
+          "EXECUTE"
+        ],
+         "privileges_with_grant_option": [
+           "EXECUTE"
+         ]
+      },
+      {
+        "name": "USERSEQID",
+        "type": "SEQUENCE",
+        "privileges": [
+          "SELECT"
+        ],
+        "privileges_with_grant_option": [
+          "SELECT"
+        ]
+      }
+    ]
+  }
+}

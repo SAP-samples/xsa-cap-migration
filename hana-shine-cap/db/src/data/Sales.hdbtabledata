@@ -1,0 +1,71 @@
+{
+    "format_version": 1,
+    "imports": [
+        {
+            "target_table": "SO_HEADER",
+            "source_data": {
+                "data_type": "CSV",
+                "file_name": "salesOrder.csv",
+                "has_header": true
+            },
+            "import_settings": {
+                "import_columns": [
+                    "SALESORDERID",
+					"HISTORY_CREATEDBY_EMPLOYEEID",
+					"HISTORY_CREATEDAT",
+					"HISTORY_CHANGEDBY_EMPLOYEEID",
+					"HISTORY_CHANGEDAT",
+					"NOTEID",
+					"PARTNER_PARTNERID",
+					"CURRENCY",
+					"GROSSAMOUNT",
+					"NETAMOUNT",
+					"TAXAMOUNT",
+					"LIFECYCLESTATUS",
+					"BILLINGSTATUS",
+					"DELIVERYSTATUS"
+                ]
+            }
+        },
+        {
+            "target_table": "SO_ITEM",
+            "source_data": {
+                "data_type": "CSV",
+                "file_name": "salesOrderItem.csv",
+                "has_header": true
+            },
+            "import_settings": {
+                "import_columns": [
+                    "SALESORDERID",
+					"SALESORDERITEM",
+					"PRODUCT_PRODUCTID",
+					"NOTEID",
+					"CURRENCY",
+					"GROSSAMOUNT",
+					"NETAMOUNT",
+					"TAXAMOUNT",
+					"ITEMATPSTATUS",
+					"OPITEMPOS",
+					"QUANTITY",
+					"QUANTITYUNIT",
+					"DELIVERYDATE"
+                ]
+            }
+        },
+        {
+            "target_table": "SO_FILTER",
+            "source_data": {
+                "data_type": "CSV",
+                "file_name": "salesOrderFilter.csv",
+                "has_header": true
+            },
+            "import_settings": {
+                "import_columns": [
+                    "MODEL",
+					"COLNAME",
+					"COLVALUE"
+                ]
+            }
+        }
+    ]
+}

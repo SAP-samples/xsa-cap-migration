@@ -1,0 +1,10 @@
+{
+    "hdi-user-service": {
+      "object_owner": {
+        "container_roles":["userG#"]
+      },
+      "application_user": {
+        "container_roles":["user"]
+      }
+    } 
+ }

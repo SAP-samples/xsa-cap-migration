@@ -1,0 +1,119 @@
+{
+    "format_version": 1,
+    "imports": [
+        {
+            "target_table": "SHADOW_MDSHADOW_ADDRESSES",
+            "source_data": {
+                "data_type": "CSV",
+                "file_name": "addresses.csv",
+                "has_header": true
+            },
+            "import_settings": {
+                "import_columns": [
+                    "ADDRESSID",
+					"CITY",
+					"POSTALCODE",
+					"STREET",
+					"BUILDING",
+					"COUNTRY",
+					"REGION",
+					"ADDRESSTYPE",
+					"VALIDITY_STARTDATE",
+					"VALIDITY_ENDDATE",
+					"LATITUDE",
+					"LONGITUDE"
+                ]
+            }
+        },
+        {
+            "target_table": "SHADOW_MDSHADOW_BUSINESSPARTNER",
+            "source_data": {
+                "data_type": "CSV",
+                "file_name": "businessPartner.csv",
+                "has_header": true
+            },
+            "import_settings": {
+                "import_columns": [
+                    "PARTNERID",
+					"PARTNERROLE",
+					"EMAILADDRESS",
+					"PHONENUMBER",
+					"FAXNUMBER",
+					"WEBADDRESS",
+					"ADDRESSES_ADDRESSID",
+					"COMPANYNAME",
+					"LEGALFORM",
+					"HISTORY_CREATEDBY_EMPLOYEEID",
+					"HISTORY_CREATEDAT",
+					"HISTORY_CHANGEDBY_EMPLOYEEID",
+					"HISTORY_CHANGEDAT",
+					"CURRENCY"
+                ]
+            }
+        },
+        {
+            "target_table": "SHADOW_MDSHADOW_EMPLOYEES",
+            "source_data": {
+                "data_type": "CSV",
+                "file_name": "employees.csv",
+                "has_header": true
+            },
+            "import_settings": {
+                "import_columns": [
+					"EMPLOYEEID",
+					"NAME_FIRST",
+					"NAME_MIDDLE",
+					"NAME_LAST",
+					"NAME_INITIALS",
+					"SEX",
+					"LANGUAGE",
+					"PHONENUMBER",
+					"EMAILADDRESS",
+					"LOGINNAME",
+					"ADDRESSES_ADDRESSID",
+					"VALIDITY_STARTDATE",
+					"VALIDITY_ENDDATE",
+					"CURRENCY",
+					"SALARYAMOUNT",
+					"ACCOUNTNUMBER",
+					"BANKID",
+					"BANKNAME",
+					"EMPLOYEEPICURL"
+                ]
+            }
+        },
+        {
+            "target_table": "SHADOW_MDSHADOW_PRODUCTS",
+            "source_data": {
+                "data_type": "CSV",
+                "file_name": "products.csv",
+                "has_header": true
+            },
+            "import_settings": {
+                "import_columns": [
+                    "PRODUCTID",
+					"TYPECODE",
+					"CATEGORY",
+					"HISTORY_CREATEDBY_EMPLOYEEID",
+					"HISTORY_CREATEDAT",
+					"HISTORY_CHANGEDBY_EMPLOYEEID",
+					"HISTORY_CHANGEDAT",
+					"NAMEID",
+					"DESCID",
+					"SUPPLIER_PARTNERID",
+					"TAXTARIFFCODE",
+					"QUANTITYUNIT",
+					"WEIGHTMEASURE",
+					"WEIGHTUNIT",
+					"CURRENCY",
+					"PRICE",
+					"PRODUCTPICURL",
+					"WIDTH",
+					"DEPTH",
+					"HEIGHT",
+					"DIMENSIONUNIT"
+                ]
+            }
+        }
+    ]
+}

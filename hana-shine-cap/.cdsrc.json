@@ -1,0 +1,69 @@
+{
+  "cds": {
+    "cov2ap" : {
+      "plugin" : true,
+      "path" : "v2"
+    },
+    "build": {
+      "target": "gen",
+      "tasks": [
+        {
+          "for": "hana",
+          "src": "user-db",
+          "options": {
+            "model": [
+              "user-db"
+            ]
+          }
+        },
+        {
+          "for": "hana",
+          "src": "db",
+          "options": {
+            "model": [
+              "db",
+              "srv",
+              "app",
+              "db/hana"
+            ]
+          }
+        },
+        {
+          "for": "nodejs",
+          "src": "srv",
+          "options": {
+            "model": [
+              "db",
+              "srv",
+              "app"
+            ]
+          }
+        }
+      ]
+    },
+    "requires": {
+      "db": {
+        "[development]": {
+          "kind": "sqlite",
+          "impl": "@cap-js/sqlite",
+          "credentials": {
+            "url": ":memory:"
+          }
+        },
+        "[production]": {
+          "kind": "hana-cloud",
+          "model": "db/hana",
+          "impl": "@sap/cds-hana"
+        }
+      },
+      "auth": {
+        "[development]": {
+          "kind": "dummy"
+        },
+        "[production]": {
+          "kind": "xsuaa"
+        }
+      }
+    }
+  }
+}

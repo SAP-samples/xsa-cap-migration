@@ -1,0 +1,6 @@
+[
+        "src/procedures/**.hdbprocedure",
+        "src/procedures/odataprocedure/**.hdbprocedure",
+        "src/models/**.hdbcalculationview",
+        "src/models/spatial/**.hdbcalculationview"
+]

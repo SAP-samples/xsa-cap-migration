@@ -1,0 +1,20 @@
+PROCEDURE "GENERATETIMEDATA" (  )
+   LANGUAGE SQLSCRIPT
+ AS
+ 
+BEGIN
+
+declare lv_schema VARCHAR(50);
+declare lv_query string;
+
+
+select current_schema into lv_schema from dummy;
+
+
+-- MDX is not supported in HANA Cloud.
+-- lv_query = 'MDX UPDATE TIME DIMENSION HOUR 2017 2023 MONDAY TARGET_TABLE "CORE_SHINE_TIME_DIM" TARGET_SCHEMA "'||:lv_schema||'"';
+
+-- EXECUTE IMMEDIATE(:lv_query);              
+  
+ 
+END

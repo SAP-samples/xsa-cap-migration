@@ -1,0 +1,20 @@
+{
+    "USERDATA_USER": {
+      "target": {
+        "object": "USERDATA_USER",
+        "schema.configure": "hdi-user-service/schema"
+      }
+    },
+    "PROCEDURES_USERSCREATEMETHOD": {
+      "target": {
+        "object": "PROCEDURES_USERSCREATEMETHOD",
+        "schema.configure": "hdi-user-service/schema"
+      }
+    },
+    "USERSEQID": {
+      "target": {
+        "object": "USERSEQID",
+        "schema.configure": "hdi-user-service/schema"
+      }
+    }
+  }
