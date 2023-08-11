@@ -26,7 +26,7 @@ SAP HANA Interactive Education or SHINE is a demo application that includes the 
   - User Authentication and Authorization (UAA)
   - App Router
   - oData V2 Services (Node.js)
-  - Nodecds
+  - Node js
   - Authorization (Roles)
   - oData Exits
   - Job Scheduler Token-Based Authentication
@@ -37,8 +37,8 @@ SHINE follows the XS Advanced Programming Model(XSA) and uses SAP HANA as a Serv
 ## Decision Table
  | Source XSA Artifact | Target CAP Artifact |	Notes	                                                      | Available Tools(for automation)	 | More Information |
  |---------------------|---------------------|--------------------------------------------------------------|----------------------------------|------------------|
- | HDBCDS entity       | CAP CDS             |Some code changes are required: <ul><li>Modify the notation in view definitions from `""` to `![]`. This is applicable wherever special characters are used in the definitions, if the special characters are not used, quotes can be removed</li><li>Change the HANA CDS Datatypes to CAP CDS Datatypes</li><li>Change table type to type or remove them</li><li>Use `@cds-persistence-exists` for temporary entities</li><li>Move all the CDS files to db folder</li><li>Remove the full text index</li><li>Convert Series entity to a regular entity</li><li>Change technical configurations and privileges</li><li>Some annotations are not supported</li><li>Context cannot be defined for annotations</li></ul><br/> Entities have to be renamed in the HDI container for that we use the `toRename` function of the CDS Compiler|  <ul><li>For creating the rename procedure we use `toRename` function of CDS compiler</li><li>There are no Tools for other steps</li></ul> | <ul><li> We have used the [xsa-to-cap-migration](https://github.tools.sap/BTP-E2EScenarioValidation/xsa-to-cap-hanacloud/tree/main/xsa-to-cap-migration) script to automate some of the changes required.</li><li> [CAP Documentation](https://cap.cloud.sap/docs/get-started/)</li><li>[Migration Guide](https://help.sap.com/docs/HANA_CLOUD/3c53bc7b58934a9795b6dd8c7e28cf05/3101cb652bb74739a3e39593ea969bc5.html)</li><li>[cds-compiler](https://www.npmjs.com/package/@sap/cds-compiler)</li><li>[Delimited Identifiers](https://cap.cloud.sap/docs/cds/cdl#delimited-identifiers)</li><li>[(Temporary) Tables](https://help.sap.com/docs/SAP_HANA_PLATFORM/3823b0f33420468ba5f1cf7f59bd6bd9/453d48e28f6747799546236b4b432e58.html)</li></ul>              |
- | Native HDB artifacts| Native HDB artifacts| <ul><li>Most of the artifacts are supported "as is" in the CAP CDS except for table types, we have to create .hdbtabletype files with the definition</li><li>hdbprocedure, hdbrole, hdbsynonym, hdbfunction, hdbsequence, hdbcalculationview, hdbtabledata are the Native HDB artifacts in SHINE that were modified</li></ul>       |    No                              |    <ol><li>We have used this [xsa-to-cap-migration](https://github.tools.sap/BTP-E2EScenarioValidation/xsa-to-cap-hanacloud/tree/main/xsa-to-cap-migration) script to rename tables and columns in some of the artifacts.</li><li>[CAP Native Hana Artifacts](https://cap.cloud.sap/docs/advanced/hana)</li></ol>              |
+ | HDBCDS entity       | CAP CDS             |Some code changes are required: <ul><li>Modify the notation in view definitions from `""` to `![]`. This is applicable wherever special characters are used in the definitions, if the special characters are not used, quotes can be removed</li><li>Change the HANA CDS Datatypes to CAP CDS Datatypes</li><li>Change table type to type or remove them</li><li>Use `@cds-persistence-exists` for temporary entities</li><li>Move all the CDS files to db folder</li><li>Remove the full text index</li><li>Convert Series entity to a regular entity</li><li>Change technical configurations and privileges</li><li>Some annotations are not supported</li><li>Context cannot be defined for annotations</li></ul><br/> Entities have to be renamed in the HDI container for that we use the `toRename` function of the CDS Compiler|  <ul><li>For creating the rename procedure we use `toRename` function of CDS compiler</li><li>There are no Tools for other steps</li></ul> | <ul><li> We have used the [xsa-to-cap-migration](https://github.com/SAP-samples/xsa-cap-migration/blob/main/migration-script) script to automate some of the changes required.</li><li> [CAP Documentation](https://cap.cloud.sap/docs/get-started/)</li><li>[Migration Guide](https://help.sap.com/docs/HANA_CLOUD/3c53bc7b58934a9795b6dd8c7e28cf05/3101cb652bb74739a3e39593ea969bc5.html)</li><li>[cds-compiler](https://www.npmjs.com/package/@sap/cds-compiler)</li><li>[Delimited Identifiers](https://cap.cloud.sap/docs/cds/cdl#delimited-identifiers)</li><li>[(Temporary) Tables](https://help.sap.com/docs/SAP_HANA_PLATFORM/3823b0f33420468ba5f1cf7f59bd6bd9/453d48e28f6747799546236b4b432e58.html)</li></ul>              |
+ | Native HDB artifacts| Native HDB artifacts| <ul><li>Most of the artifacts are supported "as is" in the CAP CDS except for table types, we have to create .hdbtabletype files with the definition</li><li>hdbprocedure, hdbrole, hdbsynonym, hdbfunction, hdbsequence, hdbcalculationview, hdbtabledata are the Native HDB artifacts in SHINE that were modified</li></ul>       |    No                              |    <ol><li>We have used this [xsa-to-cap-migration](https://github.com/SAP-samples/xsa-cap-migration/blob/main/migration-script) script to rename tables and columns in some of the artifacts.</li><li>[CAP Native Hana Artifacts](https://cap.cloud.sap/docs/advanced/hana)</li></ol>              |
  | OData service       | OData service       |  <ul><li>Supports both V2 and V4 but we have to rewrite the code from xsodata to CAP</li><li>`@OData.publish` annotation is not supported in CAP, This has to be rewritten in CAP format</li></ul>    |      No                            |                  |
  | XSJS (compatibility)| Nothing             |  It is not compatible with CAP, So it is recommended to rewrite the code in CAP    |   No                               | <ul><li>There are Sync/Async problem for Node.js > 16 so it is recommended to rewrite the code in CAP format</li></ul>              |
  | JavaScript/Node.js  | Node.js                    |    1:1 XSA-CAP    |               No                   |  [CAP NodeJS](https://cap.cloud.sap/docs/node.js/)                |
@@ -55,11 +55,11 @@ SHINE follows the XS Advanced Programming Model(XSA) and uses SAP HANA as a Serv
 
 ## Where to Start
 We have successfully migrated the SHINE sample application and content in order to identify the challenges and issues that customers have encountered in doing a migration from SAP HANA 2.0 to SAP HANA Cloud. The path followed for this Migration involves the below steps: 
-1. [Preparing XS Advanced Source and CAP Target Applications](https://github.tools.sap/BTP-E2EScenarioValidation/xsa-to-cap-hanacloud/blob/main/guide/README.md#step-1-preparing-xs-advanced-source-and-cap-target-applications)
-2. [Rename the HANA Artifacts in the Source SAP HANA 2.0/XSA HDI Container](https://github.tools.sap/BTP-E2EScenarioValidation/xsa-to-cap-hanacloud/blob/main/guide/README.md#step-2-rename-the-hana-artifacts-in-the-source-sap-hana-20xsa-hdi-container).
-3. [CAP Application Deployment with hdbcds and hdbtable format to the Source SAP HANA 2.0/XSA HDI Container](https://github.tools.sap/BTP-E2EScenarioValidation/xsa-to-cap-hanacloud/blob/main/guide/README.md#step-3-cap-application-deployment-with-hdbcds-and-hdbtable-format-to-the-source-sap-hana-20xsa-hdi-container).
-4. [Migration of SAP HANA 2.0 HDI Container using Self-Service Migration for SAP HANA Cloud and Bind the CAP application to the migrated container](https://github.tools.sap/BTP-E2EScenarioValidation/xsa-to-cap-hanacloud/blob/main/guide/README.md#step-4-migration-of-sap-hana-20-hdi-container-using-self-service-migration-for-sap-hana-cloud-and-connect-the-cap-application-to-the-migrated-container).
-5. [Migration of SRV and UI layers](https://github.tools.sap/BTP-E2EScenarioValidation/xsa-to-cap-hanacloud/blob/main/guide/README.md#step-5-migration-of-srv-and-ui-layers).
+1. [Preparing XS Advanced Source and CAP Target Applications](https://github.com/SAP-samples/xsa-cap-migration/blob/main/README.md#step-1-preparing-xs-advanced-source-and-cap-target-applications)
+2. [Rename the HANA Artifacts in the Source SAP HANA 2.0/XSA HDI Container](https://github.com/SAP-samples/xsa-cap-migration/blob/main/README.md#step-2-rename-the-hana-artifacts-in-the-source-sap-hana-20xsa-hdi-container).
+3. [CAP Application Deployment with hdbcds and hdbtable format to the Source SAP HANA 2.0/XSA HDI Container](https://github.com/SAP-samples/xsa-cap-migration/blob/main/README.md#step-3-cap-application-deployment-with-hdbcds-and-hdbtable-format-to-the-source-sap-hana-20xsa-hdi-container).
+4. [Migration of SAP HANA 2.0 HDI Container using Self-Service Migration for SAP HANA Cloud and Bind the CAP application to the migrated container](https://github.com/SAP-samples/xsa-cap-migration/blob/main/README.md#step-4-migration-of-sap-hana-20-hdi-container-using-self-service-migration-for-sap-hana-cloud-and-connect-the-cap-application-to-the-migrated-container).
+5. [Migration of SRV and UI layers](https://github.com/SAP-samples/xsa-cap-migration/blob/main/README.md#step-5-migration-of-srv-and-ui-layers).
 
 #### **Note:** 
 #### 1. The migration steps should be tested in a development environment before production.
@@ -70,11 +70,11 @@ We have successfully migrated the SHINE sample application and content in order 
 In this Step, we will prepare the XS Advanced Source and CAP Target Applications.
 ### 1.1: Clone and Deploy the XS Advanced Source Application:
 The first step of the migration is to clone and deploy the Source Application.
-- Open a command line window and Clone the [SHINE](https://github.com/SAP-samples/hana-shine-xsa/tree/shine-cf) Application.
+- Open a command line window and Clone the [SHINE](https://github.com/SAP-samples/xsa-cap-migration) Application.
   ```
-    git clone https://github.com/SAP-samples/hana-shine-xsa.git -b shine-cf
+    git clone https://github.com/SAP-samples/xsa-cap-migration.git
   ```
-- Navigate inside the root folder of the cloned application.
+- Navigate to the `hana-shine-xsa` folder.
 - Build the application
   ```
     mbt build -p=cf
@@ -90,7 +90,7 @@ The next step of the migration is to create a Target CAP application.
   #### 1.2.1: Create and initialize the project:
   In this step, we will create a Target CAP application and copy the database of the XSA application and modify it to support the CAP format.
  
- **Note:** All the below steps can be done automatically by running our [xsa-to-cap-migration](https://github.tools.sap/BTP-E2EScenarioValidation/xsa-to-cap-hanacloud/tree/main/xsa-to-cap-migration) script. This will also rename the HANA database artifacts to the CAP CDS supported format. As this is an example script, Adjust the "calcview.xsl" file with the attributes that are required by the application and build before running the script.
+ **Note:** All the below steps can be done automatically by running our [xsa-to-cap-migration](https://github.com/SAP-samples/xsa-cap-migration/blob/main/migration-script) script. This will also rename the HANA database artifacts to the CAP CDS supported format. As this is an example script, Adjust the "calcview.xsl" file with the attributes that are required by the application and build before running the script.
   
   - Open a command line window and navigate to any folder with the command `cd <folder>`.
   - Create a folder for the CAP project and navigate inside it.
@@ -99,7 +99,7 @@ The next step of the migration is to create a Target CAP application.
       cd <CAP Project folder>
     ```
   - Create an initial CAP project by executing the command `cds init` inside the root directory.
-  - Copy all the files from the database folder of the XSA/SAP HANA 2.0 Application (Eg: [core-db](https://github.com/SAP-samples/hana-shine-xsa/tree/shine-cf/core-db)) to the db folder of the newly created CAP project.
+  - Copy all the files from the database folder of the XSA/SAP HANA 2.0 Application (Eg: [core-db](https://github.com/SAP-samples/xsa-cap-migration/blob/main/hana-shine-xsa/core-db)) to the db folder of the newly created CAP project.
   
     **Note:** If the source project contains multiple containers with data in multiple folders, CAP Application can be modified to include multiple folders like db, db1 and so on and the data from the source folders can be copied to these folders.
   - Change the extension of the hdbcds files to cds.
@@ -114,9 +114,9 @@ The next step of the migration is to create a Target CAP application.
     |UTCTimestamp|Timestamp|
     |BinaryFloat|Double|
   - Replace `@OData.publish:true` with `@cds.autoexpose`.
-  - `@Comment` should be changed to [Doc comments](https://cap.cloud.sap/docs/cds/cdl#doc-comments-%E2%80%94). In the [xsa-to-cap-migration](https://github.tools.sap/BTP-E2EScenarioValidation/xsa-to-cap-hanacloud/tree/main/xsa-to-cap-migration) script, we replace `@Comment` with `@title`.
+  - `@Comment` should be changed to [Doc comments](https://cap.cloud.sap/docs/cds/cdl#doc-comments-%E2%80%94). In the [xsa-to-cap-migration](https://github.com/SAP-samples/xsa-cap-migration/blob/main/migration-script) script, we replace `@Comment` with `@title`.
   - Change the artifact table type to type or remove them as CAP CDS doesn't generate table types anymore. We will create a .hdbtabletype files for each table type definition in the later steps.
-  - Temporary entities are not supported in CAP. One way to reuse the existing table is to use [`@cds.persistence.exists`](https://cap.cloud.sap/docs/guides/databases#cds-persistence-exists) annotation for the entity in conjunction with [`.hdbdropcreatetable`](https://help.sap.com/docs/SAP_HANA_PLATFORM/3823b0f33420468ba5f1cf7f59bd6bd9/453d48e28f6747799546236b4b432e58.html). In the [xsa-to-cap-migration](https://github.tools.sap/BTP-E2EScenarioValidation/xsa-to-cap-hanacloud/tree/main/xsa-to-cap-migration) script, we just convert these entities to regular entities.
+  - Temporary entities are not supported in CAP. One way to reuse the existing table is to use [`@cds.persistence.exists`](https://cap.cloud.sap/docs/guides/databases#cds-persistence-exists) annotation for the entity in conjunction with [`.hdbdropcreatetable`](https://help.sap.com/docs/SAP_HANA_PLATFORM/3823b0f33420468ba5f1cf7f59bd6bd9/453d48e28f6747799546236b4b432e58.html). In the [xsa-to-cap-migration](https://github.com/SAP-samples/xsa-cap-migration/blob/main/migration-script) script, we just convert these entities to regular entities.
   - Move all the CDS files from their respective folders (Eg: src/) to the db folder of the CAP project. If cds files are inside the src folder then the deployment will fail because of where the "cds" plugin is. As per CAP, the cds files shouldn’t be in src folder because only the gen folder will push the data, but in the XSA application all the artifacts will reside inside the src folder. So we have to move the cds files to the db folder for the deployment to work correctly.
   - Enhance Project Configuration for SAP HANA Cloud by running the command `cds add hana`.
   - Install the npm node modules in the CAP project by running the command `npm install`.
@@ -153,7 +153,7 @@ The next step of the migration is to create a Target CAP application.
       @sql.append:'with structured privilege check'
       define view ItemView as SELECT from Item {};
     ```
-  **Note:** For the SHINE example, you can find the modified CDS files in the [Migration Repository](https://github.tools.sap/BTP-E2EScenarioValidation/capdbmigration/tree/hdbcds/db).
+  **Note:** For the SHINE example, you can find the modified CDS files in the [Migration Repository](https://github.com/SAP-samples/xsa-cap-migration/blob/main/examples/hdbcds/db).
 
 ## Step-2: Rename the HANA Artifacts in the Source SAP HANA 2.0/XSA HDI Container
 As CAP expects unquoted identifiers with `.` replaced by `_`, we have to perform some rename operation that will rename all the existing Source Artifacts to Hana Cloud/CAP supported format.
@@ -167,7 +167,7 @@ As CAP expects unquoted identifiers with `.` replaced by `_`, we have to perform
     ```
     cdsc toRename (folder name)/*.cds >  (folder name)/RENAME_HDBCDS_TO_PLAIN.hdbprocedure
     ```
-  - Update the [Calculated Element](https://github.tools.sap/BTP-E2EScenarioValidation/xsa-to-cap-hanacloud/blob/main/guide/CalculatedElement.md) field in the procedure like this:
+  - Update the [Calculated Element](https://github.com/SAP-samples/xsa-cap-migration/blob/main/examples/CalculatedElement.md) field in the procedure like this:
   
     ```
      PROCEDURE RENAME_HDBCDS_TO_PLAIN LANGUAGE SQLSCRIPT AS BEGIN --
@@ -189,7 +189,7 @@ As CAP expects unquoted identifiers with `.` replaced by `_`, we have to perform
      END;
     ```
 
-  **Note:** The [RENAME_HDBCDS_TO_PLAIN.hdbprocedure](https://github.tools.sap/BTP-E2EScenarioValidation/capdbmigration/blob/hdbcds/db/src/defaults/RENAME_HDBCDS_TO_PLAIN.hdbprocedure) file contains the code of the final Rename procedure for the SHINE example.
+  **Note:** The [RENAME_HDBCDS_TO_PLAIN.hdbprocedure](https://github.com/SAP-samples/xsa-cap-migration/blob/main/examples/hdbcds/db/src/defaults/RENAME_HDBCDS_TO_PLAIN.hdbprocedure) file contains the code of the final Rename procedure for the SHINE example.
   
   ### 2.2: Create the Default access role in the Source SAP HANA 2.0/XSA Application:
   The [default_access_role](https://help.sap.com/docs/hana-cloud-database/sap-hana-cloud-sap-hana-database-developer-guide-for-cloud-foundry-multitarget-applications-sap-business-app-studio/default-access-role-for-hdi-containers?version=2023_2_QRC) is required to Alter the tables. Without this role, the rename procedure will throw an Insufficient privilege error when called because the basic application hdi-container user will not have the alter permissions.
@@ -238,7 +238,6 @@ As CAP expects unquoted identifiers with `.` replaced by `_`, we have to perform
   ### 2.4: Update the Other Database Artifacts:
   Just like the Database Tables, the other HANA artifacts should also be renamed as the entities referenced in those artifacts no longer exist after calling the rename procedure, so on access it will throw an error. So, in the CAP Application, make the below changes
   - Delete the .hdbtabledata and .csv files.
-    <!-- We should check this - .hdbtabledata is a frequent source of issues. Better to provide a bit too much guidance than debug the issues later on. -->
     **Note:** When we migrate the HDI container the data will be retained so the sample data is not required. Retaining these files might lead to duplicate entry errors during deployment in case your table expects to have unique records.
 
   - Create .hdbtabletype files for the table types. Just converting the table type to type will not work, because during cds build, the type definition will be replaced wherever used in the hdbtable and views but if the table type is used in a procedure, the definition will not be updated and during deployment we get the error that the table type mentioned in the procedure is not provided by any file. So when we generate the hdbtabletype file with the table type definition, the deployment will work as expected. The example code is as below
@@ -252,7 +251,7 @@ As CAP expects unquoted identifiers with `.` replaced by `_`, we have to perform
     **Note:**  SAP CAP Model does not support .hdbtabletype files natively, as CAP is designed to be a database-agnostic model and platform. Instead, CAP encourages developers to use CDS for defining and working with data models. So .hdbtabletype usage should be carefully considered and properly justified as it might not integrate well with CAP environment.
   - Update the other Hana artifacts to point to the new Database tables. 
 
-    **Note:** If the [xsa-to-cap-migration](https://github.tools.sap/BTP-E2EScenarioValidation/xsa-to-cap-hanacloud/tree/main/xsa-to-cap-migration) script is used to generate the CAP Application, it will take care of renaming few of the Hana artifacts mentioned in the [list](https://github.tools.sap/BTP-E2EScenarioValidation/xsa-to-cap-hanacloud/blob/main/xsa-to-cap-migration/config.json.tpl#L15). For the remaining artifacts manual rename is required at this point to make them point to the new DB artifacts. The script does not support .hdbrole files so update these files if any to point to the new DB artifacts manually.
+    **Note:** If the [xsa-to-cap-migration](https://github.com/SAP-samples/xsa-cap-migration/blob/main/migration-script) script is used to generate the CAP Application, it will take care of renaming few of the Hana artifacts mentioned in the [list](https://github.com/SAP-samples/xsa-cap-migration/blob/main/migration-script/config.json.tpl#L15). For the remaining artifacts manual rename is required at this point to make them point to the new DB artifacts. The script does not support .hdbrole files so update these files if any to point to the new DB artifacts manually.
 
   - If there is a .hdinamespace files in your project, update it as an empty namespace as below.
     ```
@@ -265,7 +264,7 @@ As CAP expects unquoted identifiers with `.` replaced by `_`, we have to perform
     **Note:** If the Script is used, make sure the above change is made as the script will change the id, so we must ignore the namespace else it will fail during deployment.
   - Make sure the casing is correct in the calculation views, if anything is not modified it might lead to errors during deployment.
 
-  **Note:** The modified artifacts for the example SHINE Application can be accessed with the [link](https://github.tools.sap/BTP-E2EScenarioValidation/capdbmigration/tree/hdbcds/db/src).
+  **Note:** The modified artifacts for the example SHINE Application can be accessed with the [link](https://github.com/SAP-samples/xsa-cap-migration/blob/main/examples/hdbcds/db/src).
 
 ## Step-3: CAP Application Deployment with hdbcds and hdbtable format to the Source SAP HANA 2.0/XSA HDI Container.
 To retain the data in the container, we have to first deploy the CAP Application with the hdbcds format and then with hdbtable format.
@@ -294,7 +293,7 @@ To retain the data in the container, we have to first deploy the CAP Application
   - Build the CAP Application by running the command `cds build --production`. This will generate the database artifacts with the hdbcds format.
   - Deploy the CAP db module to the SAP HANA 2.0 HDI container. The deployment can be done either by using the [SAP HDI Deployer](https://www.npmjs.com/package/@sap/hdi-deploy) or by using the MTA.
   
-  **Note:** The CAP db module of the example SHINE Application with hdbcds format can be accessed with the [link](https://github.tools.sap/BTP-E2EScenarioValidation/capdbmigration/tree/hdbcds/db)
+  **Note:** The CAP db module of the example SHINE Application with hdbcds format can be accessed with the [link](https://github.com/SAP-samples/xsa-cap-migration/blob/main/examples/hdbcds/db)
   
   ### 3.2: CAP Application Deployment with hdbtable format:
   As Hana Cloud doesn't support hdbcds format, The hdbtable deployment will convert the mapped entities to hdbtables which can then be migrated to the Hana Cloud.
@@ -342,7 +341,7 @@ To retain the data in the container, we have to first deploy the CAP Application
   - Build the CAP Application by running the command `cds build --production`. This will generate the db artifacts with the hdbtable format.
   - Deploy the CAP db module to the SAP HANA 2.0 HDI container. The deployment can be done either by using the [SAP HDI Deployer](https://www.npmjs.com/package/@sap/hdi-deploy) or by using the MTA.
   
-  **Note:** The CAP db module of the example SHINE Application with hdbtable format can be accessed with the [link](https://github.tools.sap/BTP-E2EScenarioValidation/capdbmigration/tree/hdbtable/db)
+  **Note:** The CAP db module of the example SHINE Application with hdbtable format can be accessed with the [link](https://github.com/SAP-samples/xsa-cap-migration/blob/main/examples/hdbtable/db)
 
 ## Step-4: Migration of SAP HANA 2.0 HDI Container using Self-Service Migration for SAP HANA Cloud and Connect the CAP application to the migrated container.
 Migrate the SAP HANA 2.0 HDI container to Hana Cloud Container and Connect the existing CAP application to this migrated container.
@@ -368,13 +367,13 @@ Migrate the SAP HANA 2.0 HDI container to Hana Cloud Container and Connect the e
 Migrate the SRV and the UI layer of the XSA Application to CAP.
   ### 5.1: Migration of the SRV layer:
   Migrate the srv module from xsodata and xsjs to CAP.
-  - For SRV module based on the xsodata service which is exposed and where the annotation `@odata.publish:true` is written, on top of the entities write your own services to expose them in srv module. One approach to verify if the services behave in an expected way is by test driven development approach. That is to write tests for the XSA application and then run the same tests for the deployed CAP application and verify that both behave in the same manner. Eg: [service.cds](https://github.tools.sap/BTP-E2EScenarioValidation/shine-cap/blob/master/srv/service.cds)
-  - We can use the `@cds.persistence.exists` and `@cds.persistence.calcview` to expose the Calculation views. Eg: [datamodel.cds](https://github.tools.sap/BTP-E2EScenarioValidation/shine-cap/blob/master/db/cds/datamodel.cds)
+  - For SRV module based on the xsodata service which is exposed and where the annotation `@odata.publish:true` is written, on top of the entities write your own services to expose them in srv module. One approach to verify if the services behave in an expected way is by test driven development approach. That is to write tests for the XSA application and then run the same tests for the deployed CAP application and verify that both behave in the same manner. Eg: [service.cds](https://github.com/SAP-samples/xsa-cap-migration/blob/main/hana-shine-cap/srv/service.cds)
+  - We can use the `@cds.persistence.exists` and `@cds.persistence.calcview` to expose the Calculation views. Eg: [datamodel.cds](https://github.com/SAP-samples/xsa-cap-migration/blob/main/hana-shine-cap/db/cds/datamodel.cds)
   - If your existing XSA project is running with odatav2, then make the changes in your cap application by following the given [link](https://pages.github.tools.sap/cap/docs/advanced/odata#odata-v2-proxy-node).
   - Authentication and authorization can be migrated as per the business needs by following the CAP [documentation](https://cap.cloud.sap/docs/guides/authorization).
             
   ### 5.2: Migration of the UI layer:
-  We can reuse the same code for the UI layer. Just modify the OData routes and REST endpoints to point to the exposed CAP application services and endpoints. Once all the changes are made, Build and deploy the CAP application to the Hana Cloud container. Eg: [service.js](https://github.com/SAP-samples/xsa-cap-migration/xsa-cap-migration/hana-shine-cap/master/srv/service.js)
+  We can reuse the same code for the UI layer. Just modify the OData routes and REST endpoints to point to the exposed CAP application services and endpoints. Once all the changes are made, Build and deploy the CAP application to the Hana Cloud container. Eg: [service.js](https://github.com/SAP-samples/xsa-cap-migration/blob/main/hana-shine-cap/srv/service.js)
   
 ## Known Issues
 -  Part of XSJS Javascript code can be reused in CAP but it's not the recommended approach as there are Sync/Async problems for Node.js > 16 and the xsjs module is not supported for Node.js > 14
@@ -388,7 +387,7 @@ Migrate the SRV and the UI layer of the XSA Application to CAP.
 5. [Migration Guidance for Incompatible Features](https://help.sap.com/docs/hana-cloud/sap-hana-cloud-migration-guide/checks-performed-by-migration-tool).
 6. [Compatibility with Other SAP HANA Products](https://help.sap.com/docs/hana-cloud/sap-hana-cloud-migration-guide/compatibility-with-other-sap-hana-versions).
 7. [The Self-Service Migration Tool for SAP HANA Cloud](https://help.sap.com/docs/hana-cloud/sap-hana-cloud-migration-guide/self-service-migration-for-sap-hana-cloud-tool?locale=en-US).
-8. [Manual Migration of XSA to CAP](https://github.tools.sap/BTP-E2EScenarioValidation/xsa-to-cap-hanacloud/blob/main/guide/Manual.md).
+8. [Manual Migration of XSA to CAP](https://github.com/SAP-samples/xsa-cap-migration/blob/main/hana-shine-cap/examples/ManualMigration.md).
 9. [SAPUI5](https://sapui5.hana.ondemand.com/#/topic).
 10. [Fiori Elements](https://sapui5.hana.ondemand.com/sdk/#/topic/03265b0408e2432c9571d6b3feb6b1fd).
 11. [Partition a table in HANA Deployment Infrastructure(HDI)](https://blogs.sap.com/2022/01/11/partition-a-table-in-hana-deployment-infrastructurehdi/)

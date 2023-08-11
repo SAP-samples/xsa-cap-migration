@@ -1,0 +1,20 @@
+PROCEDURE "GET_BP_ADDRESSES_BY_ROLE" ( in im_partnerrole nvarchar(3) DEFAULT '1',
+    out ex_bp_addresses "PROCEDURES_TT_BP_ADDRESSES" 
+)
+   LANGUAGE SQLSCRIPT
+   SQL SECURITY INVOKER
+   --DEFAULT SCHEMA <default_schema_name>
+   READS SQL DATA AS
+BEGIN
+   /*************************************
+       Write your procedure logic 
+   *************************************/
+ex_bp_addresses = 
+     select a."PARTNERID", a."PARTNERROLE", a."EMAILADDRESS", a."COMPANYNAME",
+            a."ADDRESSES_ADDRESSID" as "ADDRESSID", b."CITY", b."POSTALCODE", b."STREET"
+              from "MD_BUSINESSPARTNER" as a 
+                 inner join "MD_ADDRESSES" as b
+                     on a."ADDRESSES_ADDRESSID" = b."ADDRESSID" 
+                              where a."PARTNERROLE" = :im_partnerrole;
+
+END

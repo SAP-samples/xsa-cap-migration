@@ -1,0 +1,10 @@
+.settings
+.project
+.hdi
+/node_modules
+/node
+target
+etc
+package-lock.json
+manifest.yml
+manifest.yaml

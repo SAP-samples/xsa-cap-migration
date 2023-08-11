@@ -1,0 +1,10 @@
+PROCEDURE "CLEAN_UP_OLD_COOKIES" ( )
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY DEFINER AS
+BEGIN
+/***************************** 
+	Write your procedure logic 
+ *****************************/
+  	DELETE FROM "UTIL_SSCOOKIE"
+	 WHERE EXPIRY <= now(); 
+END;

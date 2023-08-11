@@ -1,0 +1,39 @@
+{
+	"role":{
+		"name": "admin",
+		"schema_privileges": [{
+		   "privileges": ["SELECT METADATA", 
+		    			  "SELECT CDS METADATA", 
+		    			  "SELECT", 
+		    			  "INSERT", 
+		    			  "EXECUTE", 
+		    			  "DELETE", 
+		    			  "UPDATE", 
+		    			  "CREATE TEMPORARY TABLE"
+		   ]
+		}],
+		
+		"object_privileges":[
+			{
+				"name": "PO_HEADER",
+				"type": "TABLE",
+				"privileges": [ "SELECT" ]
+			},
+			{
+				"name": "PO_ITEM",
+				"type": "TABLE",
+				"privileges": [ "SELECT" ]
+			},
+			{
+				"name": "GET_PRODUCT_SALE_PRICE",
+				"type": "PROCEDURE",
+				"privileges": [ "EXECUTE" ]
+			},
+			{
+				"name": "PO_ITEMVIEW",
+				"type": "VIEW",
+				"privileges": [ "SELECT" ]
+			}			
+		]
+	}
+}

@@ -1,0 +1,42 @@
+PROCEDURE "GET_PRODUCTS_BY_ID" ( 
+			IN im_product_ids  "PROCEDURES_TT_PRODUCT_IDS", 
+            out ex_products "PROCEDURES_TT_PRODUCT_DETAIL")
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER 
+	--DEFAULT SCHEMA <default_schema_name>
+	READS SQL DATA AS
+BEGIN
+/***************************** 
+	Write your procedure logic 
+ *****************************/
+-- Procedure illistrates passing table as input parameter and selecting data based on data in that table
+-- Example CALL shown below procedure.
+
+ ex_products = 
+       select a."PRODUCTID", a."TYPECODE", a."CATEGORY", a."HISTORY_CREATEDBY_EMPLOYEEID", a."HISTORY_CREATEDAT",
+              a."HISTORY_CHANGEDBY_EMPLOYEEID", a."HISTORY_CHANGEDAT",  a."NAMEID", c."TEXT" as "NAME_TEXT", 
+              a."DESCID", d."TEXT" as "DESC_TEXT",  a."SUPPLIER_PARTNERID" as "SUPPLIERPARTNERID", a."TAXTARIFFCODE", 
+              a."QUANTITYUNIT", a."WEIGHTMEASURE", a."WEIGHTUNIT", a."CURRENCY", a."PRICE", a."PRODUCTPICURL", 
+              a."WIDTH", a."DEPTH", a."HEIGHT", a."DIMENSIONUNIT"
+                from "MD_PRODUCTS" as a
+                  inner join :im_product_ids as b
+                         on a."PRODUCTID" = b."PRODUCTID"
+                  inner join "UTIL_TEXTS" as c
+                         on a."NAMEID" = c."TEXTID"
+                  inner join "UTIL_TEXTS" as d
+                         on a."DESCID" = d."TEXTID";
+
+END;
+
+-- CALL from SQLConsole
+--
+-- drop table t_product_id_list;
+-- create global temporary table t_product_id_list like  "PROCEDURES_TT_PRODUCT_IDS";
+--
+-- insert into t_product_id_list values ('HT-1000');
+-- insert into t_product_id_list values ('HT-1101');
+-- insert into t_product_id_list values ('HT-6123');
+-- insert into t_product_id_list values ('HT-8000');
+--
+-- call "GET_PRODUCTS_BY_ID"( t_product_id_list, ? );
+--

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Calculation:scenario xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Calculation="http://www.sap.com/ndb/BiModelCalculation.ecore" xmlns:Variable="http://www.sap.com/ndb/BiModelVariable.ecore" id="SAP_HANA_DEMOCONTENT_EPM_MODELS_SALESORDER_RANKING_SQL" applyPrivilegeType="NONE" dataCategory="DEFAULT" dimensionType="" schemaVersion="3.0" defaultClient="$$client$$" outputViewType="Projection" calculationScenarioType="TREE_BASED" enforceSqlExecution="true">
+<descriptions defaultDescription="SALESORDER_RANKING_SQL"/>
+<localVariables>
+  <variable id="IP_FR_DTE" parameter="true">
+    <descriptions defaultDescription="IP_FR_DTE"/>
+    <variableProperties datatype="DATE" mandatory="true">
+      <valueDomain type="Date"/>
+      <selection multiLine="false"/>
+      <defaultRange lowValue="2017"/>
+    </variableProperties>
+  </variable>
+  <variable id="IP_TO_DTE" parameter="true">
+    <descriptions defaultDescription="IP_TO_DTE"/>
+    <variableProperties datatype="DATE" mandatory="true">
+      <valueDomain type="Date"/>
+      <selection multiLine="false"/>
+      <defaultRange lowValue="2020"/>
+    </variableProperties>
+  </variable>
+</localVariables>
+<variableMappings>
+  <mapping xsi:type="Variable:VariableMapping" dataSource="SALES_RANKING">
+    <targetVariable name="IP_FR_DTE" resourceUri="SALES_RANKING"/>
+    <localVariable>IP_FR_DTE</localVariable>
+  </mapping>
+  <mapping xsi:type="Variable:VariableMapping" dataSource="SALES_RANKING">
+    <targetVariable name="IP_TO_DTE" resourceUri="SALES_RANKING"/>
+    <localVariable>IP_TO_DTE</localVariable>
+  </mapping>
+</variableMappings>
+<dataSources>
+  <DataSource id="SALES_RANKING" type="TABLE_FUNCTION" partitionedExecution="false">
+    <resourceUri>SALES_RANKING</resourceUri>
+  </DataSource>
+</dataSources>
+<calculationViews/>
+<logicalModel id="SALES_RANKING">
+  <attributes>
+    <attribute id="COMPANY_NAME" order="1" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="COMPANY_NAME"/>
+      <keyMapping columnObjectName="SALES_RANKING" columnName="COMPANY_NAME"/>
+    </attribute>
+    <attribute id="SALES" order="2" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="SALES"/>
+      <keyMapping columnObjectName="SALES_RANKING" columnName="SALES"/>
+    </attribute>
+    <attribute id="ORDERS" order="3" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="ORDERS"/>
+      <keyMapping columnObjectName="SALES_RANKING" columnName="ORDERS"/>
+    </attribute>
+    <attribute id="SALES_RANK" order="4" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="SALES_RANK"/>
+      <keyMapping columnObjectName="SALES_RANKING" columnName="SALES_RANK"/>
+    </attribute>
+    <attribute id="ORDER_RANK" order="5" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="ORDER_RANK"/>
+      <keyMapping columnObjectName="SALES_RANKING" columnName="ORDER_RANK"/>
+    </attribute>
+  </attributes>
+  <calculatedAttributes/>
+  <baseMeasures/>
+  <calculatedMeasures/>
+  <restrictedMeasures/>
+</logicalModel>
+<layout>
+ <shapes>
+    <shape expanded="true" modelObjectName="Output" modelObjectNameSpace="MeasureGroup">
+      <upperLeftCorner x="40" y="85"/>
+    </shape>
+  </shapes>
+</layout>
+</Calculation:scenario>
