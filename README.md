@@ -70,11 +70,10 @@ We have successfully migrated the SHINE sample application and content in order 
 In this Step, we will prepare the XS Advanced Source and CAP Target Applications.
 ### 1.1: Clone and Deploy the XS Advanced Source Application:
 The first step of the migration is to clone and deploy the Source Application.
-- Open a command line window and Clone the [SHINE](https://github.com/SAP-samples/xsa-cap-migration) Application.
+- Open a command line window and Clone the [SHINE](https://github.com/SAP-samples/hana-shine-xsa) Application.
   ```
-    git clone https://github.com/SAP-samples/xsa-cap-migration.git
+    git clone https://github.com/SAP-samples/hana-shine-xsa.git
   ```
-- Navigate to the `hana-shine-xsa` folder.
 - Build the application
   ```
     mbt build -p=cf
