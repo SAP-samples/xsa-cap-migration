@@ -157,7 +157,7 @@ Migrate the SRV and the UI layer of the XSA Application to CAP.
   Migrate the srv module from xsodata and xsjs to CAP.
   - For SRV module based on the xsodata service which is exposed and where the annotation `@odata.publish:true` is written, on top of the entities write your own services to expose them in srv module. One approach to verify if the services behave in an expected way is by test driven development approach. That is to write tests for the XSA application and then run the same tests for the deployed CAP application and verify that both behave in the same manner. Eg: [service.cds](https://github.com/SAP-samples/xsa-cap-migration/blob/main/hana-shine-cap/srv/service.cds)
   - We can use the `@cds.persistence.exists` and `@cds.persistence.calcview` to expose the Calculation views. Eg: [datamodel.cds](https://github.com/SAP-samples/xsa-cap-migration/blob/main/hana-shine-cap/db/datamodel.cds)
-  - If your existing XSA project is running with odatav2, then make the changes in your cap application by following the given [link](https://cap.cloud.sap/docs/advanced/odata#odata-v2-proxy-node).
+  - If your existing XSA project is running with odatav2, then make the changes in your cap application by following the given [link](https://pages.github.tools.sap/cap/docs/advanced/odata#odata-v2-proxy-node).
   - Authentication and authorization can be migrated as per the business needs by following the CAP [documentation](https://cap.cloud.sap/docs/guides/authorization).
   
   **Note:** 
