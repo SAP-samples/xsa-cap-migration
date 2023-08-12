@@ -26,9 +26,8 @@ We have successfully migrated the SHINE sample application and content in order 
 ### Step-1: Clone and deploy the SAP HANA 2.0 Application to the source HDI Container
 The first step of the migration is to deploy the (Eg: [SHINE](https://github.com/SAP-samples/hana-shine-xsa)) application to the source HDI Container.
 
-- Clone the [SHINE](https://github.com/SAP-samples/hana-shine-xsa) application.
+- Clone the [SHINE](https://github.com/SAP-samples/hana-shine-xsa/tree/shine-cf) application.
 - Create a source HDI Container for the Hana as a Service database instance by following this [Document](https://help.sap.com/docs/HANA_SERVICE_CF/cc53ad464a57404b8d453bbadbc81ceb/93cdbb1bd50d49fe872e7b648a4d9677.html) and bind or connect the SAP HANA 2.0 Shine Application to the created HDI container.
-- Follow these [Steps](https://github.com/SAP-samples/hana-shine-xsa/blob/main/SHINE-XSA.md) before building the Shine Application.
 - Build and Deploy the core-db module to the source HDI container. The deployment can be done either by using the [SAP HDI Deployer](https://www.npmjs.com/package/@sap/hdi-deploy) or by using the MTA.
 
 ### Step-2: Creation and Setup of CAP Application
