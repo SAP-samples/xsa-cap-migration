@@ -32,7 +32,7 @@ SAP HANA Interactive Education or SHINE is a demo application that includes the 
   - Job Scheduler Token-Based Authentication
   - oData Batch
 
-SHINE follows the XS Advanced Programming Model(XSA) and uses SAP HANA as a Service for the database. This article describes the steps to be followed to Migrate this demo application to the Cloud Application Programming Model(CAP) with SAP HANA Cloud as the database.
+SHINE follows the XS Advanced Programming Model(XSA) and uses SAP HANA Service for the database. This article describes the steps to be followed to Migrate this demo application to the Cloud Application Programming Model(CAP) with SAP HANA Cloud as the database.
   
 ## Decision Table
  | Source XSA Artifact | Target CAP Artifact |	Notes	                                                      | Available Tools(for automation)	 | More Information |

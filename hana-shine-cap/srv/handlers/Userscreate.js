@@ -1,6 +1,4 @@
 'use strict';
-const cds = require('@sap/cds');
-
 
 /**
  * This asynchronous function is responsible for creating a new user.
@@ -11,15 +9,16 @@ const cds = require('@sap/cds');
  */
 
 async function createUser(req) {
+  let usertemp;
   try {
-    const result = await cds.run('SELECT "USERSEQID".NEXTVAL FROM DUMMY');
-    const UserId = result[0]['USERSEQID.NEXTVAL'];
-    await INSERT.into('USERDATA_USER').entries({
-      USERID: UserId,
-      FIRSTNAME: req.data.FirstName,
-      LASTNAME: req.data.LastName,
-      EMAIL: req.data.Email
-    });
+    const values = [
+      [ req.data.UserId, req.data.FirstName, req.data.LastName, req.data.Email ]
+    ];
+    usertemp = `#usertemp_${ cds.utils.uuid().replace(/-/g, '_') }`
+    await cds.run(`create local temporary table ${ usertemp } ( UserId INT, FirstName NVARCHAR(40), LastName NVARCHAR(40), Email NVARCHAR(40))`)
+    await cds.run(`insert into ${ usertemp } values (?,?,?,?)`, values)
+    const query = `CALL "PROCEDURES_USERSCREATEMETHOD"(IM_ROW => ${ usertemp }, EX_ERROR => ?)`;
+    await cds.run(query)
     return req.data;
   }
   catch (e) {
@@ -27,6 +26,10 @@ async function createUser(req) {
       500,
       `Error in user creation: ${ e.message }`
     )
+  }
+  finally {
+    if (usertemp)
+      await cds.run(`DROP TABLE ${ usertemp }`)
   }
 }
 

@@ -65,8 +65,7 @@ Type HistT {
         BANKID: EPM.BusinessKey;
         BANKNAME: EPM.LString;
         EMPLOYEEPICURL: EPM.LString;
-        @sql.append: `generated always as NAME_FIRST || ' ' || NAME_LAST`
-        FULLNAME: String(100);
+        FULLNAME: String(100) = (NAME.FIRST || ' ' || NAME.LAST) stored;
     };
 
     Entity Products {
