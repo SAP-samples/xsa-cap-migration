@@ -17,7 +17,7 @@ We have successfully migrated the SHINE sample application and content in order 
 2. [Creation and Setup of CAP Application](https://github.com/SAP-samples/xsa-cap-migration/blob/main/examples/ManualMigration.md#step-2-creation-and-setup-of-cap-application).
 3. [Update the Other Database Artifacts in the CAP Application](https://github.com/SAP-samples/xsa-cap-migration/blob/main/examples/ManualMigration.md#step-3-update-the-other-database-artifacts-in-the-cap-application).
 4. [Deploy the CAP Application to the target HDI Container](https://github.com/SAP-samples/xsa-cap-migration/blob/main/examples/ManualMigration.md#step-4-deploy-the-cap-application-to-the-target-hdi-container).
-5. [Manually migrate the Date from Source HDI Container to target HDI Container](https://github.com/SAP-samples/xsa-cap-migration/blob/main/examples/ManualMigration.md#step-5-manually-migrate-the-date-from-source-hdi-container-to-target-hdi-container).
+5. [Manually migrate the Data from Source HDI Container to target HDI Container](https://github.com/SAP-samples/xsa-cap-migration/blob/main/examples/ManualMigration.md#step-5-manually-migrate-the-data-from-source-hdi-container-to-target-hdi-container).
 6. [Migration of SRV and UI layers](https://github.com/SAP-samples/xsa-cap-migration/blob/main/examples/ManualMigration.md#step-6-migration-of-srv-and-ui-layers)
 
 #### **Note:** The migration steps should be tested in a development environment before production.
@@ -146,7 +146,7 @@ In this step, we will deploy the CAP Application to the target HDI Container. Th
   - Bind or Connect the CAP Application to the target HDI container.
   - Build and Deploy the CAP db module to the target HDI container. The deployment can be done either by using the [SAP HDI Deployer](https://www.npmjs.com/package/@sap/hdi-deploy) or by using the MTA.
 
-### Step-5: Manually migrate the Date from Source HDI Container to target HDI Container
+### Step-5: Manually migrate the Data from Source HDI Container to target HDI Container
 Follow the [Documentation](https://help.sap.com/docs/HANA_CLOUD/3c53bc7b58934a9795b6dd8c7e28cf05/5bc8c6f7b216490bbecd2e9bf54f3e69.html) to migrate the data stored in source HDI container to SAP HANA Cloud.
 
 **Note:** The list of virtual tables for Shine example can be found in the [virtual.sql](https://github.com/SAP-samples/xsa-cap-migration/blob/main/examples/virtual.sql) file.

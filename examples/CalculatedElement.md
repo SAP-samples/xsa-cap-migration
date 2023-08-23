@@ -1,79 +1,187 @@
-Calculated Elements in Rename Procedure
-=======================================
-<!--
-This sample is a HANA CDS calc-on-read. We could probably just drop such fields and then model them as calc-on-read in CAP - they are somewhat persisted on the
-database, using native HANA calc-on-read. Does our native hdbcds -> CAP-hdbcds handover work with such an approach?
+Calculated Elements
+====================
 
-Our approach below is NOT a right fit for such calc-on-read, but moreso for calc-on-write.
+## Rename Procedure:
+CAP Supports two types of calculated elements - [Calculated Elements On-Read](https://cap.cloud.sap/docs/releases/march23#calculated-elements-beta) and [Calculated Elements On-Write](https://cap.cloud.sap/docs/releases/jun23#calculated-elements-on-write).
 
-We should also provide a sample for calc-on-write. Calc-on-write is not supported by CAP for .hdbcds, can be modeled via @sql.append.
-To check: Does it work if we remove the calc-part, turn it into a normal field and re-add the calculation-part in the inital CAP-hdbcds deployment?
-Or should we/can we do it in the CAP-hdbcds -> CAP-hdbtable handover? That would allow us to model it as a calc-on-write in CAP.
--->
-When dealing with calculated elements, Renaming them becomes tricky. In the below sample, the calculated element `FULLNAME` references the fields `NAME.FIRST` and `NAME.LAST`. During our rename, we would normally rename these fields, but this will not work, since the calculated field references them. This means that we will need to manually adapt the generated rename-procedure.
+In the sample below, I have two calculated elements, `FULLNAMEONREAD` and `FULLNAMEONWRITE`, both referencing the fields `NAME.FIRST` and `NAME.LAST`. Renaming these fields can be tricky, as the calculated elements reference them. Normally, we would rename these fields during our rename process, but this won't work in this case. We therefore need to manually adapt the generated rename-procedure. For calc-on-write, we have to replace the calculated field with a normal field, while preserving the data. For calc-on-read, we can simply drop the field as it will not result in a field on the database.
 
-    ```
-     Entity Employees {
-       key  ID: Integer;
-       NAME {
-         FIRST: String;
-         LAST: String;
-       };
-       FULLNAME: String(100) = NAME.FIRST || ' ' || NAME.LAST;
+     Entity Employees { 
+        key  ID: Integer;
+        NAME {
+            FIRST: String(10);
+            LAST: String(10);
+        };
+        FULLNAMEONREAD: String(100) = (NAME.FIRST || ' ' || NAME.LAST);
+        FULLNAMEONWRITE: String(100) generated always as  (NAME.FIRST || ' ' || NAME.LAST);
      };
-    ```
-    
-In the rename procedure, We need to replace the calculated field `FULLNAME: String(100) = NAME.FIRST || ' ' || NAME.LAST;` with a normal field `FULLNAME: String(100);`, but keep the data. We are starting from the following `.hdbprocedure`:
 
-    ```
+We are starting from the following `.hdbprocedure`:
+
      PROCEDURE RENAME_HDBCDS_TO_PLAIN LANGUAGE SQLSCRIPT AS BEGIN --
      -- Employees
-     EXEC 'RENAME TABLE "Employees" TO "EMPLOYEES"';
+        EXEC 'RENAME TABLE "Employees" TO Employees';
      
-     EXEC 'RENAME COLUMN "EMPLOYEES"."NAME.FIRST" TO "NAME_FIRST"';
+        EXEC 'RENAME COLUMN Employees."NAME.FIRST" TO NAME_FIRST';
      
-     EXEC 'RENAME COLUMN "EMPLOYEES"."NAME.LAST" TO "NAME_LAST"';
+        EXEC 'RENAME COLUMN Employees."NAME.LAST" TO NAME_LAST';
      
      END;
-    ```
     
-As a first step, we rename the old field to `__FULLNAME`, the chosen name needs to be one where there are no name collisions!
+As a first step, we drop the field `FULLNAMEONREAD`. calc-on-read approach in CAP ensures that calculations are performed on the fly when data is accessed, and as a result, these particular fields won't need to be permanently stored in the database.
 
-    ```
-     EXEC 'RENAME COLUMN "EMPLOYEES"."FULLNAME" TO "__FULLNAME"';
-    ```
+     EXEC 'ALTER TABLE Employees DROP (FULLNAMEONREAD)';
+
+For calc-on-write, we rename the field `FULLNAMEONWRITE` to `__FULLNAMEONWRITE`, the chosen name needs to be one where there are no name collisions!
     
-As a second step, we add a new field `FULLNAME`, which has the same data type as `__FULLNAME`.
+     EXEC 'RENAME COLUMN Employees."FULLNAMEONWRITE" TO __FULLNAMEONWRITE';
+  
+As a second step, we add a new field `FULLNAMEONWRITE`, which has the same data type as `__FULLNAMEONWRITE`.
 
-    ```
-     EXEC 'ALTER TABLE "EMPLOYEES" ADD ("FULLNAME" NVARCHAR(100))';
-    ```
+     EXEC 'ALTER TABLE Employees ADD (FULLNAMEONWRITE NVARCHAR(100))';
     
-Finally, we copy the data from `__FULLNAME` to `FULLNAME` and drop the field afterwards.
+Finally, we copy the data from `__FULLNAMEONWRITE` to `FULLNAMEONWRITE` and drop the field afterwards.
 
-    ```
-     EXEC 'UPDATE "EMPLOYEES" SET "FULLNAME" = "__FULLNAME"';
-     EXEC 'ALTER TABLE "EMPLOYEES" DROP ("__FULLNAME")';
-    ```
+     EXEC 'UPDATE Employees SET FULLNAMEONWRITE = __FULLNAMEONWRITE';
+
+     EXEC 'ALTER TABLE Employees DROP (__FULLNAMEONWRITE)';
     
 Afterwards, we can execute the renames as usual. So our final `.hdbprocedure` will look like this:
 
-    ```
-     PROCEDURE RENAME_HDBCDS_TO_PLAIN LANGUAGE SQLSCRIPT AS BEGIN --
-     -- Employees
-     EXEC 'RENAME TABLE "Employees" TO "EMPLOYEES"';
+    PROCEDURE RENAME_HDBCDS_TO_PLAIN LANGUAGE SQLSCRIPT AS BEGIN
 
-     EXEC 'RENAME COLUMN "EMPLOYEES"."FULLNAME" TO "__FULLNAME"';
+        -- Rename the Employees Table
 
-     EXEC 'ALTER TABLE "EMPLOYEES" ADD ("FULLNAME" NVARCHAR(100))';
+        EXEC 'RENAME TABLE "Employees" TO Employees';
 
-     EXEC 'UPDATE "EMPLOYEES" SET "FULLNAME" = "__FULLNAME"';
+        -- Calc on Read
 
-     EXEC 'ALTER TABLE "EMPLOYEES" DROP ("__FULLNAME")';
+        EXEC 'ALTER TABLE Employees DROP (FULLNAMEONREAD)';
 
-     EXEC 'RENAME COLUMN "EMPLOYEES"."NAME.FIRST" TO "NAME_FIRST"';
+        -- Calc on Write
 
-     EXEC 'RENAME COLUMN "EMPLOYEES"."NAME.LAST" TO "NAME_LAST"';
+        EXEC 'RENAME COLUMN Employees."FULLNAMEONWRITE" TO __FULLNAMEONWRITE';
 
-     END;
-    ```
+        EXEC 'ALTER TABLE Employees ADD (FULLNAMEONWRITE NVARCHAR(100))';
+
+        EXEC 'UPDATE Employees SET FULLNAMEONWRITE = __FULLNAMEONWRITE';
+
+        EXEC 'ALTER TABLE Employees DROP (__FULLNAMEONWRITE)';
+
+        -- Rename the columns
+
+        EXEC 'RENAME COLUMN Employees."NAME.FIRST" TO NAME_FIRST';
+
+        EXEC 'RENAME COLUMN Employees."NAME.LAST" TO NAME_LAST';
+
+    END;
+    
+## Deployment:
+During the hdbcds and hdbtable deployments, Calculated elements on-read and Calculated elements on-write strategies can be implemented in different ways, it's important to choose the best strategy based on your particular use case and performance expectations. 
+### Calculated elements on-write:
+Calculated elements on-write are not supported for HDBCDS. Therefore, during hdbcds type deployment, the calculation must be included in a `@sql.append` annotation placed above the column, as shown below.
+
+    Entity Employees {
+        key  ID: Integer;
+        NAME {
+            FIRST: String(10);
+            LAST: String(10);
+        };
+        @sql.append: `generated always as NAME_FIRST || ' ' || NAME_LAST`
+        FULLNAMEONWRITE: String(100);
+    };
+    
+Upon building, an **hdbcds** file as shown below will be generated. This file can then be deployed to the HDI Container.
+    
+    entity EMPLOYEES {
+        key ID : Integer;
+        NAME_FIRST : String(10);
+        NAME_LAST : String(10);
+        FULLNAMEONWRITE : String(100) generated always as NAME_FIRST || ' ' || NAME_LAST;
+    };
+
+**Note:** Once the hdbcds deployment is complete, refrain from adding any additional data to the table.
+
+For the hdbtable deployment, we can implement the Calc-on-write feature as follows:
+    
+    Entity Employees {
+        key  ID: Integer;
+        NAME {
+            FIRST: String(10);
+            LAST: String(10);
+        };
+        FULLNAMEONWRITE: String(100) = NAME.FIRST || ' ' || NAME.LAST stored;
+    };
+    
+Upon building, an **hdbtable** file as shown below will be generated. This file can then be deployed to the HDI Container.
+
+    COLUMN TABLE Employees (
+        ID INTEGER NOT NULL,
+        NAME_FIRST NVARCHAR(10),
+        NAME_LAST NVARCHAR(10),
+        FULLNAMEONWRITE NVARCHAR(100) GENERATED ALWAYS AS (NAME_FIRST || ' ' || NAME_LAST),
+        PRIMARY KEY(ID)
+    )
+
+### Calculated elements on-read:
+Calculated elements on-read are supported for both hdbcds and hdbtable. They serve as a "predefined" calculation expressions that can be used in views or projections on top of the entity. 
+
+In our example, the Calc-on-read feature can be implemented as follows:
+
+db/Employees.cds:
+ 
+    Entity Employees {
+        key  ID: Integer;
+        NAME {
+            FIRST: String(10);
+            LAST: String(10);
+        };
+        FULLNAMEONREAD: String(100) = NAME.FIRST || ' ' || NAME.LAST;
+    };
+
+srv/service.cds:
+
+    using {Employees} from '../db/Employees';
+
+    service EmpService @(path: '/employee') {
+        entity BusinessPartners as projection on Employees { ID, FULLNAMEONREAD };
+    }
+
+During hdbcds deployment, below **hdbcds** files will be generated on build. These files can then be deployed to the HDI Container.
+
+EMPLOYEES.hdbcds:
+
+    entity EMPLOYEES {
+        key ID : Integer;
+        NAME_FIRST : String(10);
+        NAME_LAST : String(10);
+    };
+
+EMPSERVICE_BUSINESSPARTNERS.hdbcds:
+
+    using EMPLOYEES as EMPLOYEES;
+    view EMPSERVICE_BUSINESSPARTNERS as select from EMPLOYEES as EMPLOYEES_0 {
+        key EMPLOYEES_0.ID as ID,
+        EMPLOYEES_0.NAME_FIRST || ' ' || EMPLOYEES_0.NAME_LAST as FULLNAMEONREAD
+    };
+
+During hdbtable deployment, below **hdbtable** and **hdbview** files will be generated on build. These files can then be deployed to the HDI Container.
+
+Employees.hdbtable:
+
+    COLUMN TABLE Employees (
+        ID INTEGER NOT NULL,
+        NAME_FIRST NVARCHAR(10),
+        NAME_LAST NVARCHAR(10),
+        PRIMARY KEY(ID)
+    )
+
+EmpService.BusinessPartners.hdbview:
+
+    VIEW EmpService_BusinessPartners AS SELECT
+        Employees_0.ID,
+        Employees_0.NAME_FIRST || ' ' || Employees_0.NAME_LAST AS FULLNAMEONREAD
+    FROM Employees AS Employees_0
+
+## License
+Copyright (c) 2023 SAP SE or an SAP affiliate company. All rights reserved.
