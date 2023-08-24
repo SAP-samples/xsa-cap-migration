@@ -35,14 +35,6 @@
           }
         }
       ]
-    },
-    {
-      "fileExts": ["cds"],
-      "strategies": [
-        {
-          "name": "CDS"
-        }
-      ]
     }
   ],
   "scanPath": "{CAP_DIR}/**",
