@@ -2,6 +2,7 @@ const readline = require('readline');
 const fs1 = require('fs');
 const { execSync } = require('child_process');
 const path = require('path');
+const os = require('os');
 const util = require('util');
 const ncp = util.promisify(require('ncp'));
 const mkdir = util.promisify(fs1.mkdir);
@@ -101,12 +102,11 @@ const setup_db = async(source, destination) => {
     await shell.find('.')
     .filter(file => file.endsWith('.cds'))
     .forEach(file => {
-      shell.exec(`sh -c "cat ${file} |
-          sed -e 's/LocalDate/Date/g' |
-          sed -e 's/LocalTime/Time/g' |
-          sed -e 's/UTCDateTime/DateTime/g' |
-          sed -e 's/UTCTimestamp/Timestamp/g' |
-          sed -e 's/BinaryFloat/Double/g' > ${file}.newtypes; mv ${file}.newtypes ${file};"`)
+          replaceInFile(file, 'LocalDate', 'Date');
+          replaceInFile(file, 'LocalTime', 'Time');
+          replaceInFile(file, 'UTCDateTime', 'DateTime');
+          replaceInFile(file, 'UTCTimestamp', 'Timestamp');
+          replaceInFile(file, 'BinaryFloat', 'Double');
     });
     console.log("Change table type to type and table Type to Type");
     await shell.find('.').filter((file) => file.endsWith('.cds')).forEach((file) => {
@@ -139,6 +139,12 @@ const setup_db = async(source, destination) => {
   }
 }
 
+const replaceInFile = (filePath, searchValue, replaceValue) => {
+  const fileContent = fs1.readFileSync(filePath, 'utf8');
+  const newContent = fileContent.replace(new RegExp(searchValue, 'g'), replaceValue);
+  fs1.writeFileSync(filePath, newContent);
+};
+
 const findFiles = async(dir) => {
   try{
     const outDir = path.resolve(dir, '../logs');
@@ -147,7 +153,7 @@ const findFiles = async(dir) => {
     }
     let files = await shell.ls('-Rl', `${dir}/*.cds`);
     for(const file of files) {
-      let tmp = '/tmp/shelljs_' + Math.random().toString().slice(2);
+      let tmp = path.join(os.tmpdir(), 'shelljs_' + Math.random().toString().slice(2));
       await shell.exec(`cds compile ${file.name} 2> ${tmp}`, { silent: true });
       if (fs1.statSync(tmp).size !== 0) {
         await shell.mv(tmp, path.join(outDir, `${path.basename(file.name)}.errors.log`));
