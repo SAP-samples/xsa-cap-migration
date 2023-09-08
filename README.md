@@ -372,7 +372,9 @@ Migrate the SRV and the UI layer of the XSA Application to CAP.
   - Authentication and authorization can be migrated as per the business needs by following the CAP [documentation](https://cap.cloud.sap/docs/guides/authorization).
             
   ### 5.2: Migration of the UI layer:
-  We can reuse the same code for the UI layer. Just modify the OData routes and REST endpoints to point to the exposed CAP application services and endpoints. Once all the changes are made, Build and deploy the CAP application to the Hana Cloud container. Eg: [service.js](https://github.com/SAP-samples/xsa-cap-migration/blob/main/hana-shine-cap/srv/service.js)
+  We can reuse the same code for the UI layer. Just modify the OData routes and REST endpoints to point to the exposed CAP application services and endpoints Eg: [service.js](https://github.com/SAP-samples/xsa-cap-migration/blob/main/hana-shine-cap/srv/service.js).
+
+Once all the changes are made, Build and deploy the CAP application to the SAP BTP/HANA Cloud environment.
   
 ## Known Issues
 -  Part of XSJS Javascript code can be reused in CAP but it's not the recommended approach as there are Sync/Async problems for Node.js > 16 and the xsjs module is not supported for Node.js > 14
