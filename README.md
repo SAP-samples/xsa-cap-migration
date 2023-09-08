@@ -375,8 +375,14 @@ Migrate the SRV and the UI layer of the XSA Application to CAP.
   We can reuse the same code for the UI layer. Just modify the OData routes and REST endpoints to point to the exposed CAP application services and endpoints Eg: [service.js](https://github.com/SAP-samples/xsa-cap-migration/blob/main/hana-shine-cap/srv/service.js).
 
   ### 5.3: Deploy the CAP application to the SAP BTP/HANA Cloud environment:
-  Once all the changes are made, Build and deploy the CAP application to the SAP BTP/HANA Cloud environment using the [MTA Deployment Descriptor (mta.yml)](https://developers.sap.com/tutorials/btp-app-cap-mta-deployment.html).
-  
+  Once all the changes are made, Build and deploy the CAP application to the SAP BTP/HANA Cloud environment using the MTA Deployment Descriptor Eg: [mta.yml](https://github.com/SAP-samples/xsa-cap-migration/blob/main/hana-shine-cap/mta.yaml).
+  - Build the application using the command `mbt build -p=cf` from the root folder of the target CAP application.
+  - Once the build is complete, an mta_archives folder will be generated. Navigate inside the mta_archives folder.
+  - Deploy the target CAP application to the SAP BTP/HANA Cloud environment environment using the below command.
+    ```
+     cf deploy <Generated_MTAR_Name>.mtar
+    ```
+    
 ## Known Issues
 -  Part of XSJS Javascript code can be reused in CAP but it's not the recommended approach as there are Sync/Async problems for Node.js > 16 and the xsjs module is not supported for Node.js > 14
 -  There is No Option to select the specific containers to migrate so it will migrate all the containers in the given space.
