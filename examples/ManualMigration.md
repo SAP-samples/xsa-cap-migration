@@ -70,7 +70,7 @@ The second step of the migration is to create a CAP application.
   In this step, we will remove or modify the unsupported database features in the CAP CDS files. Some of them are listed below
   - Remove the full text index as they are no longer supported.
   - Convert Series entity to a regular entity.
-  - Convert Calculated field to regular field and use the `@sql.append` annotation above the field to add the calculation as below example
+  - Change the Calculated field to a [Stored calculated element](https://cap.cloud.sap/docs/releases/jun23#calculated-elements-on-write) as below example
     ```
       Entity Employees {
         key  ID: Integer;
@@ -78,10 +78,10 @@ The second step of the migration is to create a CAP application.
           FIRST: String;
           LAST: String;
         };
-        @sql.append: `generated always as NAME_FIRST || '' || NAME_LAST`
-        FULLNAME: String(100);
+        FULLNAME: String(100) = (NAME.FIRST || ' ' || NAME.LAST) stored;
       };
     ```
+    **Note:** Stored calculated element is supported from cds version 7 onwards.
   - Add the technical configurations in the `@sql.append` annotations above the entity as below example.
    
     Eg:
