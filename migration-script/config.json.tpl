@@ -1,7 +1,7 @@
 {
   "migrations": [
     {
-      "fileExts": ["hdbcalculationview"],
+      "fileExts": ["hdbcalculationview", "hdbanalyticprivilege"],
       "strategies": [
         {
           "name": "XSLT",
@@ -12,7 +12,7 @@
       ]
     },
     {
-      "fileExts": ["hdbconstraint", "hdbindex", "hdbview", "hdbsequence", "hdbprocedure", "hdbtablefunction", "hdbfunction", "hdbsynonymconfig", "hdbstructuredprivilege", "hdblibrary"],
+      "fileExts": ["hdbconstraint", "hdbindex", "hdbview", "hdbsequence", "hdbprocedure", "hdbtablefunction", "hdbfunction", "hdbstructuredprivilege", "hdblibrary"],
       "strategies": [
         {
           "name": "CharReplacementUppercase",
