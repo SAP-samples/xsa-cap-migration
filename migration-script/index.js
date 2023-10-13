@@ -29,9 +29,18 @@ async function askQuestion(query) {
 
 async function getParams() {
   try{
+    const questionOP = 'Choose your migration path:' + '\n' + '1. XSA to CAP' + '\n' + '2. XSC to CAP' + '\n' + 'Enter 1 or 2: ';
+    const option = await askQuestion(questionOP);
+    if(!isNaN(option) && (option == 1 || option == 2)){
+      process.env.option = option;
+    } else {
+      console.log("Invalid input!! Please enter either 1 or 2");
+      return await getParams();
+    }
     const cap = await askQuestion('Enter the path of the CAP project to be created (It should contain the CAP Folder name as well): ');
     process.env.CAP_DIR = cap;
-    const haas = await askQuestion('Enter the path of the XSA project: ');
+    const haasPrompt = (process.env.OPTION == 2) ? 'Enter the path of the XSA project generated after running the migration assistant for XSC: ' : 'Enter the path of the XSA project: ';
+    const haas = await askQuestion(haasPrompt);
     process.env.XSA_DIR = haas;
     const container = parseInt(await askQuestion('Enter the number of containers in the project: '));
     if(!isNaN(container)){
@@ -68,14 +77,14 @@ const setup_cap_project = (CAP_DIR) => {
   process.chdir('../');
 }
 
-const setup_db_containers = (CAP_DIR,XSA_DIR,CONTAINER_NUM,paramArray) => {
+const setup_db_containers = (CAP_DIR,XSA_DIR,CONTAINER_NUM,paramArray, option) => {
   try {
     if(CONTAINER_NUM == 1){
       var haas_db_src = XSA_DIR + "/" + paramArray[0];
       var cap_db_dest = CAP_DIR + "/db";
-      setup_db(haas_db_src, cap_db_dest, CAP_DIR);
+      setup_db(haas_db_src, cap_db_dest, option);
     } else if (CONTAINER_NUM > 1) {
-      createFolderAndCopy(CAP_DIR,XSA_DIR,CONTAINER_NUM,paramArray);
+      createFolderAndCopy(CAP_DIR,XSA_DIR,CONTAINER_NUM,paramArray, option);
     }
     console.log("Exposing Tables and views");
     createOdata(CAP_DIR);
@@ -88,7 +97,7 @@ const setup_db_containers = (CAP_DIR,XSA_DIR,CONTAINER_NUM,paramArray) => {
   }
 }
 
-const setup_db = (source, destination, CAP_DIR) => {
+const setup_db = (source, destination, option) => {
   try {
     console.log("Copying db artifacts to CAP project...");
     fsExtra.copySync(source, destination);
@@ -150,7 +159,7 @@ const setup_db = (source, destination, CAP_DIR) => {
       shell.exec(`sh -c "cat ${file} | sed -e 's/generated always.*;/;/g' > ${file}.cases; mv ${file}.cases ${file};"`);
     });
     console.log("Format hdbrole and hdbtabledata");
-    formatRoleandTabledata('.');
+    formatRoleandTabledata('.', option);
     console.log("Format hdbsynonymconfig");
     formatSynonymConfig('.');
     console.log("Create hdbtabletype files");
@@ -162,7 +171,7 @@ const setup_db = (source, destination, CAP_DIR) => {
     console.log("Move the cds files to a cds folder and create an index.cds");
     moveAndIndexCds('.', './cds');
     console.log("Modify the technical configurations");
-    technicalConfig('.');
+    technicalConfig('.', option);
     console.log("Update the Structure privilege check");
     structuredPrivilege('.');
     console.log("Remove Series Entity");
@@ -171,8 +180,8 @@ const setup_db = (source, destination, CAP_DIR) => {
     commentAnnotation('.');
     console.log("Modify the annotation syntax");
     annotationUpdate('./cds');
-    console.log("Remove Schema")
-    updateSchema('.');
+    // console.log("Remove Schema")
+    // updateSchema('.');
     console.log("Compile the cds files and create a log file");
     findFiles('.');
     process.chdir('../');
@@ -341,20 +350,20 @@ const renameFiles = (directory, oldExtension, newExtension) => {
   }
 }
 
-const createFolderAndCopy = (CAP_DIR,XSA_DIR,CONTAINER_NUM,paramArray) => {
+const createFolderAndCopy = (CAP_DIR,XSA_DIR,CONTAINER_NUM,paramArray, option) => {
   try{
     for(let i = 0; i < CONTAINER_NUM; i++){
       if(i === 0){
         var haas_db_src = XSA_DIR + "/" + paramArray[0];
         var cap_db_dest = CAP_DIR + "/db";
-        setup_db(haas_db_src, cap_db_dest);
+        setup_db(haas_db_src, cap_db_dest, option);
       } else {
         let newFolder = path.join(CAP_DIR, 'db'+ i);
         if (!fs1.existsSync(newFolder)){
           fs1.mkdirSync(newFolder);
         }
         var haas_db_src = XSA_DIR + "/" + paramArray[i];
-        setup_db(haas_db_src, newFolder);
+        setup_db(haas_db_src, newFolder, option);
       }
     }
   } catch (error) {
@@ -456,9 +465,15 @@ const hdinamespace = () => {
   }
 }
 
-const formatRoleandTabledata = (directory) => {
+const formatRoleandTabledata = (directory, option) => {
   try{
-    const files = shell.find(directory).filter(file => file.endsWith('.hdbtabledata') || file.endsWith('.hdbrole') || file.endsWith('.hdbgrants'));
+    if(option == 1) {
+      deleteFilesEmptyFolders(directory);
+    }
+    const files = shell.find(directory).filter(file => file.endsWith('.hdbrole') || file.endsWith('.hdbgrants'));
+    if(option == 2){
+      files.push(...shell.find(directory).filter(file => file.endsWith('.hdbtabledata')));
+    }
     for (const file of files) {
       let data = fs1.readFileSync(file, 'utf8');
       const jsonData = JSON.parse(data);
@@ -839,20 +854,31 @@ const replaceSimpleUsingInFiles = (directory) => {
   }
 }
 
-const technicalConfig = (directory) => {
+const technicalConfig = (directory, option) => {
   try {
     const files = shell.find(directory).filter(file => file.endsWith('.cds'));
     files.forEach(function (file) {
       let fileData = fs1.readFileSync(file, 'utf8');
       if(/((?:\/\*.+\*\/\s)*Entity[\s\S]*?})\s+technical configuration\s+\{[\s\S]*?\}/.test(fileData)){
         fileData = fileData.replace(/((?:\/\*.+\*\/\s)*Entity[\s\S]*?})\s+technical configuration\s+\{([\s\S]*?)\}/g, (match, p1, p2) => {
-          let techConfigValue = p2.replace(/fulltext\s*index[\s\S]*?;/gi, '').replace(/column\s*store[\s\S]*?;/gi, '').replace(/row\s*store[\s\S]*?;/gi, '').trim();
-          techConfigValue = techConfigValue.replace(/\;\s*$/, '');
-          techConfigValue = techConfigValue.replace(/\s\s+/g, ' ');
-          if (techConfigValue === '') {
-            return `\n${p1}`;
+          let techConfigValue;
+          if (option == 1) {
+            techConfigValue = p2.replace(/fulltext\s*index[\s\S]*?;/gi, '').trim();
+            techConfigValue = techConfigValue.replace(/\s\s+/g, ' ');
+            if (techConfigValue === '') {
+              return `\n${p1}`;
+            } else {
+              return `\n@sql.append: \`\`\`\n  technical configuration {\n    ${techConfigValue}\n  }\n\`\`\`\n${p1}`;
+            }
           } else {
-            return `@sql.append: \`${techConfigValue}\`\n${p1}`;
+            techConfigValue = p2.replace(/fulltext\s*index[\s\S]*?;/gi, '').replace(/column\s*store[\s\S]*?;/gi, '').replace(/row\s*store[\s\S]*?;/gi, '').trim();
+            techConfigValue = techConfigValue.replace(/\;\s*$/, '');
+            techConfigValue = techConfigValue.replace(/\s\s+/g, ' ');
+            if (techConfigValue === '') {
+              return `\n${p1}`;
+            } else {
+              return `@sql.append: \`${techConfigValue}\`\n${p1}`;
+            }
           }
         });
         fs1.writeFileSync(file, fileData, 'utf8');
@@ -1055,14 +1081,15 @@ const main = async() => {
   try{
     var CURR_DIR = process.cwd();
     await getParams();
-    var CAP_DIR, XSA_DIR, CONTAINER_NUM, paramArray, APPNAME;
+    var CAP_DIR, XSA_DIR, CONTAINER_NUM, paramArray, APPNAME, option;
     CAP_DIR = process.env.CAP_DIR;
     XSA_DIR = process.env.XSA_DIR;
     CONTAINER_NUM = process.env.CONTAINER_NUM;
     paramArray = JSON.parse(process.env.DBARRAY);
     APPNAME = process.env.APP;
+    option = process.env.option;
     setup_cap_project(CAP_DIR);
-    setup_db_containers(CAP_DIR,XSA_DIR,CONTAINER_NUM,paramArray);
+    setup_db_containers(CAP_DIR,XSA_DIR,CONTAINER_NUM,paramArray, option);
     mtaandxsuaa(CAP_DIR);
     setup_app(CAP_DIR, XSA_DIR, APPNAME);
     odataV2Support(CAP_DIR);
