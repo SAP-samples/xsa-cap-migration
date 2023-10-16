@@ -152,6 +152,7 @@ The next step of the migration is to create a Target CAP application.
     **Note:** During hdbtable deployment we will convert this to a Stored calculated element.
   - Based on the advanced odata annotations, convert it to the [CAP structure](https://cap.cloud.sap/docs/advanced/odata#annotating-annotations).
   - We can use `@cds.persistence.udf` for [User-Defined Functions in the Calculation view](https://cap.cloud.sap/docs/advanced/hana#calculated-views-and-user-defined-functions).
+  
   **Note:** For the SHINE example, you can find the modified CDS files in the [hdbcds](https://github.com/SAP-samples/xsa-cap-migration/blob/main/examples/hdbcds/db) examples folder.
 
 ## Step-2: Rename the HANA Artifacts in the Source SAP HANA 2.0/XSA HDI Container
