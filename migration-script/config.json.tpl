@@ -12,7 +12,7 @@
       ]
     },
     {
-      "fileExts": ["hdbconstraint", "hdbindex", "hdbview", "hdbsequence", "hdbprocedure", "hdbtablefunction", "hdbfunction", "hdbstructuredprivilege", "hdblibrary"],
+      "fileExts": ["hdbconstraint", "hdbindex", "hdbview", "hdbtable", "hdbsequence", "hdbprocedure", "hdbtablefunction", "hdbfunction", "hdbstructuredprivilege", "hdblibrary"],
       "strategies": [
         {
           "name": "CharReplacementUppercase",
