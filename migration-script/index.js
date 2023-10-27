@@ -180,8 +180,8 @@ const setup_db = (source, destination, option) => {
     commentAnnotation('.');
     console.log("Modify the annotation syntax");
     annotationUpdate('./cds');
-    // console.log("Remove Schema")
-    // updateSchema('.');
+    console.log("Remove Schema")
+    updateSchema('.');
     console.log("Compile the cds files and create a log file");
     findFiles('.');
     process.chdir('../');
@@ -1019,8 +1019,8 @@ const updateSchema = (directoryPath) => {
               return '--' + match1.trim();
             }
           });
-          let regex3 = /(?:\b|\")([\w.]+)(?:\b|\")\.\"([\w.:]+)\"/g;
-          newData = newData.replace(regex3, '"$2"');
+          let regex3 = /(?:\b|\")([\w.]+)(?:\b|\")\.(\"[\w.]+::[\w.]+\")/g;
+          newData = newData.replace(regex3, '$2');
           if (data !== newData) {
             fs1.writeFileSync(filePath, newData, 'utf8');
             console.log('File has been updated:', filePath);
