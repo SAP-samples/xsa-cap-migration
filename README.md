@@ -71,18 +71,18 @@ In this Step, we will prepare the XS Advanced Source and CAP Target Applications
 ### 1.1: Clone and Deploy the XS Advanced Source Application:
 The first step of the migration is to clone and deploy the Source Application.
 1. Open a command line terminal and clone the [SHINE](https://github.com/SAP-samples/hana-shine-xsa/tree/shine-cf) Application.
-  ```
-    git clone https://github.com/SAP-samples/hana-shine-xsa.git -b shine-cf
-  ```
+   ```
+   git clone https://github.com/SAP-samples/hana-shine-xsa.git -b shine-cf
+   ```
 2. Build the application
-  ```
-    mbt build -p=cf
-  ```
+   ```
+   mbt build -p=cf
+   ```
 3. Once the build is complete, an mta_archives folder will be created in the root folder. Navigate inside the mta_archives folder.
 4. Deploy the source application to the SAP Business Technology Platform(SAP BTP) using the below command.
-  ```
+   ```
    cf deploy <Generated_MTAR_Name>.mtar
-  ```
+   ```
 
 ### 1.2: Creation and Setup of the Target CAP Application
 The next step of the migration is to create a Target CAP application.
@@ -94,62 +94,64 @@ The next step of the migration is to create a Target CAP application.
   1. Open a command line window and navigate to any folder with the command `cd <folder>`.
   2. Create a folder for the CAP project and navigate inside it.
      ```
-       mkdir <CAP Project folder>
-       cd <CAP Project folder>
+     mkdir <CAP Project folder>
+     cd <CAP Project folder>
      ```
   3. Create an initial CAP project by executing the command `cds init` inside the root directory.
   4. Copy all the files from the database folder of the XSA/SAP HANA 2.0 Application (Eg: [core-db](https://github.com/SAP-samples/xsa-cap-migration/blob/main/hana-shine-xsa/core-db)) to the db folder of the newly created CAP project.
   
-    **Note:** If the source project contains multiple containers with data in multiple folders, CAP Application can be modified to include multiple folders like db, db1 and so on and the data from the source folders can be copied to these folders.
+     **Note:** If the source project contains multiple containers with data in multiple folders, CAP Application can be modified to include multiple folders like db, db1 and so on and the data from the source folders can be copied to these folders.
+    
   5. Change the extension of the hdbcds files to cds.
   6. Modify the notation in view definitions from `""` to `![]`(Eg: `"PurchaseOrderId"` to `![PurchaseOrderId]`). This [delimiter](https://cap.cloud.sap/docs/cds/cdl#delimited-identifiers) makes the processing in CAPCDS more reliable.
   7. Change the HANA CDS Datatypes to CAP CDS Datatypes.
 
-    | HANA CDS | CAP CDS |
-    |----------|---------|
-    |LocalDate|Date|
-    |LocalTime|Time|
-    |UTCDateTime|DateTime|
-    |UTCTimestamp|Timestamp|
-    |BinaryFloat|Double|
-  8. Replace `@OData.publish:true` with `@cds.autoexpose`.
-  9. `@Comment` should be changed to [Doc comments](https://cap.cloud.sap/docs/cds/cdl#doc-comments-%E2%80%94). In the [migration-script](https://github.com/SAP-samples/xsa-cap-migration/blob/main/migration-script) script, we replace `@Comment` with `@title`.
-  10. Change the artifact table type to type or remove them as CAP CDS doesn't generate table types anymore. We will create a .hdbtabletype files for each table type definition in the later steps.
-  11. Temporary entities are not supported in CAP. One way to reuse the existing table is to use [`@cds.persistence.exists`](https://cap.cloud.sap/docs/guides/databases#cds-persistence-exists) annotation for the entity in conjunction with [`.hdbdropcreatetable`](https://help.sap.com/docs/SAP_HANA_PLATFORM/3823b0f33420468ba5f1cf7f59bd6bd9/453d48e28f6747799546236b4b432e58.html). In the [migration-script](https://github.com/SAP-samples/xsa-cap-migration/blob/main/migration-script) script, we just convert these entities to regular entities.
-  12. Move all the CDS files from their respective folders (Eg: src/) to the db folder of the CAP project. If cds files are inside the src folder then the deployment will fail because of where the "cds" plugin is. As per CAP, the cds files shouldn’t be in src folder because only the gen folder will push the data, but in the XSA application all the artifacts will reside inside the src folder. So we have to move the cds files to the db folder for the deployment to work correctly.
-  13. Remove the full text index as they are no longer supported.
-  14. Convert Series entity to a regular entity.
-  15. Add the technical configurations in the `@sql.append` annotation above the entity as below example
+     | HANA CDS | CAP CDS |
+     |----------|---------|
+     |LocalDate|Date|
+     |LocalTime|Time|
+     |UTCDateTime|DateTime|
+     |UTCTimestamp|Timestamp|
+     |BinaryFloat|Double|
+     
+  9. Replace `@OData.publish:true` with `@cds.autoexpose`.
+  10. `@Comment` should be changed to [Doc comments](https://cap.cloud.sap/docs/cds/cdl#doc-comments-%E2%80%94). In the [migration-script](https://github.com/SAP-samples/xsa-cap-migration/blob/main/migration-script) script, we replace `@Comment` with `@title`.
+  11. Change the artifact table type to type or remove them as CAP CDS doesn't generate table types anymore. We will create a .hdbtabletype files for each table type definition in the later steps.
+  12. Temporary entities are not supported in CAP. One way to reuse the existing table is to use [`@cds.persistence.exists`](https://cap.cloud.sap/docs/guides/databases#cds-persistence-exists) annotation for the entity in conjunction with [`.hdbdropcreatetable`](https://help.sap.com/docs/SAP_HANA_PLATFORM/3823b0f33420468ba5f1cf7f59bd6bd9/453d48e28f6747799546236b4b432e58.html). In the [migration-script](https://github.com/SAP-samples/xsa-cap-migration/blob/main/migration-script) script, we just convert these entities to regular entities.
+  13. Move all the CDS files from their respective folders (Eg: src/) to the db folder of the CAP project. If cds files are inside the src folder then the deployment will fail because of where the "cds" plugin is. As per CAP, the cds files shouldn’t be in src folder because only the gen folder will push the data, but in the XSA application all the artifacts will reside inside the src folder. So we have to move the cds files to the db folder for the deployment to work correctly.
+  14. Remove the full text index as they are no longer supported.
+  15. Convert Series entity to a regular entity.
+  16. Add the technical configurations in the `@sql.append` annotation above the entity as below example
       ```
-        @sql.append: ```
-        technical configuration { 
-          partition by HASH  (PARTNERID) Partitions GET_NUM_SERVERS();
-        } ```
-        Entity BusinessPartner {}
+      @sql.append: ```
+      technical configuration { 
+        partition by HASH  (PARTNERID) Partitions GET_NUM_SERVERS();
+      } ```
+      Entity BusinessPartner {}
       ```
-  16. Add the privileges in the `@sql.append` annotation above the view. 
+  17. Add the privileges in the `@sql.append` annotation above the view. 
       ```
-        @sql.append:'with structured privilege check'
-        define view ItemView as SELECT from Item {};
+      @sql.append:'with structured privilege check'
+      define view ItemView as SELECT from Item {};
       ```
-  17. Enhance Project Configuration for SAP HANA Cloud by running the command `cds add hana`.
-  18. Install the npm node modules in the CAP project by running the command `npm install`.
+  18. Enhance Project Configuration for SAP HANA Cloud by running the command `cds add hana`.
+  19. Install the npm node modules in the CAP project by running the command `npm install`.
   
   #### 1.2.2: Remove or Modify the Unsupported database features:
   In this step, we will manually remove or modify the unsupported database features in the CAP CDS files. Some of them are listed below
   1. Convert Calculated field to regular field and use the `@sql.append` annotation above the field to add the calculation as below example
      ```
-      Entity Employees {
-        key  ID: Integer;
-        NAME {
+     Entity Employees {
+       key  ID: Integer;
+       NAME {
           FIRST: String;
           LAST: String;
-        };
-        @sql.append: `generated always as NAME_FIRST || '' || NAME_LAST`
-        FULLNAME: String(100);
-      };
+       };
+       @sql.append: `generated always as NAME_FIRST || '' || NAME_LAST`
+       FULLNAME: String(100);
+     };
      ``` 
-    **Note:** During hdbtable deployment we will convert this to a Stored calculated element.
+     **Note:** During hdbtable deployment we will convert this to a Stored calculated element.
   2. Based on the advanced odata annotations, convert it to the [CAP structure](https://cap.cloud.sap/docs/advanced/odata#annotating-annotations).
   3. We can use `@cds.persistence.udf` for [User-Defined Functions in the Calculation view](https://cap.cloud.sap/docs/advanced/hana#calculated-views-and-user-defined-functions).
   
@@ -165,28 +167,28 @@ As CAP expects unquoted identifiers with `.` replaced by `_`, we have to perform
   2. Create a folder outside the CAP application and copy all the cds files here (Note: Views can be ignored as they will be renamed during deployment).
   3. Call the toRename function to generate the hdbprocedure with the below command. This will create a RENAME_HDBCDS_TO_PLAIN.hdbprocedure file.
      ```
-      cdsc toRename (folder name)/*.cds >  (folder name)/RENAME_HDBCDS_TO_PLAIN.hdbprocedure
+     cdsc toRename (folder name)/*.cds >  (folder name)/RENAME_HDBCDS_TO_PLAIN.hdbprocedure
      ```
   4. Update the [Calculated Element](https://github.com/SAP-samples/xsa-cap-migration/blob/main/examples/CalculatedElement.md) field in the procedure like this:
   
      ```
-      PROCEDURE RENAME_HDBCDS_TO_PLAIN LANGUAGE SQLSCRIPT AS BEGIN --
-      -- Employees
-      EXEC 'RENAME TABLE "Employees" TO "EMPLOYEES"';
+     PROCEDURE RENAME_HDBCDS_TO_PLAIN LANGUAGE SQLSCRIPT AS BEGIN --
+     -- Employees
+     EXEC 'RENAME TABLE "Employees" TO "EMPLOYEES"';
 
-      EXEC 'RENAME COLUMN "EMPLOYEES"."FULLNAME" TO "__FULLNAME"';
+     EXEC 'RENAME COLUMN "EMPLOYEES"."FULLNAME" TO "__FULLNAME"';
 
-      EXEC 'ALTER TABLE "EMPLOYEES" ADD ("FULLNAME" NVARCHAR(100))';
+     EXEC 'ALTER TABLE "EMPLOYEES" ADD ("FULLNAME" NVARCHAR(100))';
 
-      EXEC 'UPDATE "EMPLOYEES" SET "FULLNAME" = "__FULLNAME"';
+     EXEC 'UPDATE "EMPLOYEES" SET "FULLNAME" = "__FULLNAME"';
 
-      EXEC 'ALTER TABLE "EMPLOYEES" DROP ("__FULLNAME")';
+     EXEC 'ALTER TABLE "EMPLOYEES" DROP ("__FULLNAME")';
 
-      EXEC 'RENAME COLUMN "EMPLOYEES"."NAME.FIRST" TO "NAME_FIRST"';
+     EXEC 'RENAME COLUMN "EMPLOYEES"."NAME.FIRST" TO "NAME_FIRST"';
 
-      EXEC 'RENAME COLUMN "EMPLOYEES"."NAME.LAST" TO "NAME_LAST"';
+     EXEC 'RENAME COLUMN "EMPLOYEES"."NAME.LAST" TO "NAME_LAST"';
 
-      END;
+     END;
      ```
 
   **Note:** The [RENAME_HDBCDS_TO_PLAIN.hdbprocedure](https://github.com/SAP-samples/xsa-cap-migration/blob/main/examples/hdbcds/db/src/defaults/RENAME_HDBCDS_TO_PLAIN.hdbprocedure) file contains the code of the final Rename procedure for the SHINE example.
@@ -199,7 +201,7 @@ As CAP expects unquoted identifiers with `.` replaced by `_`, we have to perform
   1. In the XSA/SAP HANA 2.0 Application, create a "defaults" folder inside the "src" folder.
   2. Create the file "default_access_role.hdbrole" with the `ALTER` privilege added in the defaults folder as below
      ```
-      {
+     {
         "role" : {
           "name" : "default_access_role",
           "schema_privileges": [
@@ -218,14 +220,14 @@ As CAP expects unquoted identifiers with `.` replaced by `_`, we have to perform
             }
           ]
         }
-      }
+     }
      ```
   3. Create a .hdinamespace file in the "defaults" folder with the empty name space as below to ensure that the role can be named default_access_role. 
      ```
-      {
+     {
         "name": "",
         "subfolder": "ignore"
-      }
+     }
      ```
   4. Also move the above created RENAME_HDBCDS_TO_PLAIN.hdbprocedure file to the "procedures" folder.
   5. Deploy the rename procedure and default access role into the SAP HANA 2.0 HDI Container. The deployment can be done either by using the [SAP HDI Deployer](https://www.npmjs.com/package/@sap/hdi-deploy) or by using the MTA.
@@ -244,30 +246,31 @@ As CAP expects unquoted identifiers with `.` replaced by `_`, we have to perform
   **Note:** All the below steps can be done automatically if the [migration-script](https://github.com/SAP-samples/xsa-cap-migration/blob/main/migration-script) is used to convert the application from XSA to CAP.
   
   1. Delete the .hdbtabledata and .csv files.
-    **Note:** When we migrate the HDI container the data will be retained so the sample data is not required. Retaining these files might lead to duplicate entry errors during deployment in case your table expects to have unique records.
 
-  2. Create .hdbtabletype files for the table types. Just converting the table type to type will not work, because during cds build, the type definition will be replaced wherever used in the hdbtable and views but if the table type is used in a procedure, the definition will not be updated and during deployment we get the error that the table type mentioned in the procedure is not provided by any file. So when we generate the hdbtabletype file with the table type definition, the deployment will work as expected. The example code is as below
+     **Note:** When we migrate the HDI container the data will be retained so the sample data is not required. Retaining these files might lead to duplicate entry errors during deployment in case your table expects to have unique records.
+
+  3. Create .hdbtabletype files for the table types. Just converting the table type to type will not work, because during cds build, the type definition will be replaced wherever used in the hdbtable and views but if the table type is used in a procedure, the definition will not be updated and during deployment we get the error that the table type mentioned in the procedure is not provided by any file. So when we generate the hdbtabletype file with the table type definition, the deployment will work as expected. The example code is as below
      ```
-      TYPE "PROCEDURES_TT_ERRORS" AS TABLE ( 
+     TYPE "PROCEDURES_TT_ERRORS" AS TABLE ( 
         "HTTP_STATUS_CODE" Integer,
         "ERROR_MESSAGE" VARCHAR(5000),
         "DETAIL" NVARCHAR(100)
-      );
+     );
      ```
-    **Note:**  SAP CAP Model does not support .hdbtabletype files natively, as CAP is designed to be a database-agnostic model and platform. Instead, CAP encourages developers to use CDS for defining and working with data models. So .hdbtabletype usage should be carefully considered and properly justified as it might not integrate well with CAP environment.
+     **Note:**  SAP CAP Model does not support .hdbtabletype files natively, as CAP is designed to be a database-agnostic model and platform. Instead, CAP encourages developers to use CDS for defining and working with data models. So .hdbtabletype usage should be carefully considered and properly justified as it might not integrate well with CAP environment.
   3. Update the other Hana artifacts to point to the new Database tables. 
 
-    **Note:** [migration-script](https://github.com/SAP-samples/xsa-cap-migration/blob/main/migration-script) will take care of renaming most of the Hana artifacts mentioned in the [list](https://github.com/SAP-samples/xsa-cap-migration/blob/main/migration-script/config.json.tpl#L15). It will also handle .hdbrole, .hdbsynonymconfig, .hdbsynonym , .hdbroleconfig and .hdbgrants separately. For the remaining artifacts manual rename is required at this point to make them point to the new DB artifacts.
+     **Note:** [migration-script](https://github.com/SAP-samples/xsa-cap-migration/blob/main/migration-script) will take care of renaming most of the Hana artifacts mentioned in the [list](https://github.com/SAP-samples/xsa-cap-migration/blob/main/migration-script/config.json.tpl#L15). It will also handle .hdbrole, .hdbsynonymconfig, .hdbsynonym , .hdbroleconfig and .hdbgrants separately. For the remaining artifacts manual rename is required at this point to make them point to the new DB artifacts.
 
   4. If there is a .hdinamespace files in your project, update it as an empty namespace as below.
      ```
-      {
+     {
         "name": "",
         "subfolder": "ignore"
-      }
+     }
      ```
   
-    **Note:** If the Script is used, make sure the above change is made as the script will change the id, so we must ignore the namespace else it will fail during deployment.
+     **Note:** If the Script is used, make sure the above change is made as the script will change the id, so we must ignore the namespace else it will fail during deployment.
   5. Make sure the casing is correct in the calculation views, if anything is not modified it might lead to errors during deployment.
 
   **Note:** The modified artifacts for the example SHINE Application can be accessed with the [link](https://github.com/SAP-samples/xsa-cap-migration/blob/main/examples/hdbcds/db/src).
@@ -278,7 +281,7 @@ To retain the data in the container, we have to first deploy the CAP Application
   The hdbcds deployment will map the CAP entities to the existing entities in the SAP HANA 2.0 HDI container.
   1. Open the package.json file in the root folder of the CAP application and change the deploy-format into "hdbcds" and kind as "hana" as below.
      ```
-      "cds": {
+     "cds": {
         "hana": {
           "deploy-format": "hdbcds"
         },
@@ -287,14 +290,14 @@ To retain the data in the container, we have to first deploy the CAP Application
             "kind": "hana"
           }
         }
-      }
+     }
      ```
   2. Next, we need to remove the rename procedure and the default_access_role as its no longer required. Delete the RENAME_HDBCDS_TO_PLAIN.hdbprocedure from the "procedures" folder and also delete the "defaults" folder. Add the path of these files in the undeploy.json file like this:
      ```
-      [
+     [
         "src/defaults/*",
         "src/procedures/RENAME_HDBCDS_TO_PLAIN.hdbprocedure"
-      ]
+     ]
      ```
   3. Build the CAP Application by running the command `cds build --production`. This will generate the database artifacts with the hdbcds format.
   4. Deploy the CAP db module to the SAP HANA 2.0 HDI container. The deployment can be done either by using the [SAP HDI Deployer](https://www.npmjs.com/package/@sap/hdi-deploy) or by using the MTA.
@@ -305,7 +308,7 @@ To retain the data in the container, we have to first deploy the CAP Application
   As Hana Cloud doesn't support hdbcds format, The hdbtable deployment will convert the mapped entities to hdbtables which can then be migrated to the Hana Cloud.
   1. Open the package.json file in the root folder of the CAP application and change the deploy-format into "hdbtable".
      ```
-      "cds": {
+     "cds": {
         "hana": {
           "deploy-format": "hdbtable"
         },
@@ -314,34 +317,34 @@ To retain the data in the container, we have to first deploy the CAP Application
             "kind": "hana"
           }
         }
-      }
+     }
      ```
   2. Change the Calculated field to a [Stored calculated element](https://cap.cloud.sap/docs/releases/jun23#calculated-elements-on-write) as below example
      ```
-      Entity Employees {
+     Entity Employees {
         key  ID: Integer;
         NAME {
           FIRST: String;
           LAST: String;
         };
         FULLNAME: String(100) = (NAME.FIRST || ' ' || NAME.LAST) stored;
-      };
+     };
      ```
-    **Note:**  Stored calculated element is supported from cds version 7 onwards.
+     **Note:**  Stored calculated element is supported from cds version 7 onwards.
   3. Modify the `@sql.append` annotations above the entity to remove the technical configuration blocks.
     
      Eg:
      ```
-      @sql.append:'PARTITION BY HASH  ( "PARTNERID" ) PARTITIONS GET_NUM_SERVERS()'
-      Entity BusinessPartner {}
+     @sql.append:'PARTITION BY HASH  ( "PARTNERID" ) PARTITIONS GET_NUM_SERVERS()'
+     Entity BusinessPartner {}
      ```
-    **Note:** Technical configurations of Row store: Since we are converting the temporary table to table, by default it will be stored as a column table so we can remove the row store. Technical configurations of Column store: Its default so it can also be removed.
+     **Note:** Technical configurations of Row store: Since we are converting the temporary table to table, by default it will be stored as a column table so we can remove the row store. Technical configurations of Column store: Its default so it can also be removed.
   4. Open the undeploy.json file in the db folder and update it to undeploy all the hdbcds database artifacts and replace them with .hdbtable database artifacts like this:
 
      ```
-      [
+     [
         "src/gen/*.hdbcds"
-      ]
+     ]
      ```
 
   5. Build the CAP Application by running the command `cds build --production`. This will generate the db artifacts with the hdbtable format.
@@ -358,13 +361,13 @@ Migrate the SAP HANA 2.0 HDI container to Hana Cloud Container and Connect the e
   Bind and Deploy the existing CAP application to the migrated container
   1. In the CAP Application, Open the package.json file in the root folder and change the kind to "hana-cloud". **Note:** `deploy-format` can be removed as `hdbtable` is the default deploy format for Hana Cloud.
      ```
-      "cds": {
+     "cds": {
         "requires": {
           "db": {
             "kind": "hana-cloud"
           }
         }
-      }
+     }
      ```
   2. Bind or Connect the CAP Application to the HANA Cloud container created by the migration service.
   3. Build and Deploy the CAP db module to the Hana Cloud container. The deployment can be done either by using the [SAP HDI Deployer](https://www.npmjs.com/package/@sap/hdi-deploy) or by using the MTA.
@@ -387,7 +390,7 @@ Migrate the SRV and the UI layer of the XSA Application to CAP.
   2. Once the build is complete, an mta_archives folder will be generated. Navigate inside the mta_archives folder.
   3. Deploy the target CAP application to the SAP BTP/HANA Cloud environment environment using the below command.
      ```
-      cf deploy <Generated_MTAR_Name>.mtar
+     cf deploy <Generated_MTAR_Name>.mtar
      ```
     
 ## Known Issues
