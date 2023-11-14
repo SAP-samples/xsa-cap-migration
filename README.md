@@ -260,7 +260,7 @@ As CAP expects unquoted identifiers with `.` replaced by `_`, we have to perform
      **Note:**  SAP CAP Model does not support .hdbtabletype files natively, as CAP is designed to be a database-agnostic model and platform. Instead, CAP encourages developers to use CDS for defining and working with data models. So .hdbtabletype usage should be carefully considered and properly justified as it might not integrate well with CAP environment.
   3. Update the other Hana artifacts to point to the new Database tables. 
 
-     **Note:** [migration-script](https://github.com/SAP-samples/xsa-cap-migration/blob/main/migration-script) will take care of renaming most of the Hana artifacts mentioned in the [list](https://github.com/SAP-samples/xsa-cap-migration/blob/main/migration-script/config.json.tpl#L15). It will also handle .hdbrole, .hdbsynonymconfig, .hdbsynonym , .hdbroleconfig and .hdbgrants separately. For the remaining artifacts manual rename is required at this point to make them point to the new DB artifacts.
+     **Note:** [migration-script](https://github.com/SAP-samples/xsa-cap-migration/blob/main/migration-script) will take care of renaming all of the Hana artifacts mentioned in the [list](https://github.com/SAP-samples/xsa-cap-migration/blob/main/migration-script/config.json.tpl#L15). It will also handle the renaming of the .hdbrole, .hdbsynonymconfig, .hdbsynonym , .hdbroleconfig and .hdbgrants. For the remaining artifacts manual rename is required at this point to make them point to the new DB artifacts.
 
   4. If there is a .hdinamespace files in your project, update it as an empty namespace as below.
      ```

@@ -289,6 +289,7 @@ const createOdata = (pattern) => {
         const constructs = data.match(/(entity|view|Entity|View)\s+(\w+)/g) || [];
         constructs.forEach((construct) => {
           const entityName = construct.replace(/(entity|view|Entity|View)\s+/, "");
+          if (entityName === 'on') return;
           const uniqueEntityName = `${context}_${entityName}`;
           serviceContent += `entity ${uniqueEntityName} @(restrict:[{grant:['READ','WRITE'],to:'write'},{grant:'READ',to:'read'}]) as projection on ${context}.${entityName};\n`;
         });
@@ -590,8 +591,9 @@ const removeEmptyDirectories = (dir) => {
         removeEmptyDirectories(fullPath);
       }
     }
-    if ((files.length === 0 || (files.length === 1 && files[0] === '.hdinamespace')) && shell.test('-d', dir)) {
-      if (files[0] === '.hdinamespace' && shell.test('-f', path.join(dir, '.hdinamespace'))) {
+    const filesAfterCleanup = fs1.readdirSync(dir);
+    if ((filesAfterCleanup.length === 0 || (filesAfterCleanup.length === 1 && filesAfterCleanup[0] === '.hdinamespace')) && shell.test('-d', dir)) {
+      if (filesAfterCleanup[0] === '.hdinamespace' && shell.test('-f', path.join(dir, '.hdinamespace'))) {
         fs1.unlinkSync(path.join(dir, '.hdinamespace'));
       }
       fs1.rmdirSync(dir);
@@ -759,6 +761,9 @@ const odataV2Support = async (directory) => {
     };
     fs1.writeFileSync('package.json', JSON.stringify(packageJson, null, 2));
     console.log("Successfully Added Odata V2 Support");
+    execSync('npm install @sap/cds-dk', { stdio: 'inherit', cwd: absDirectory  });
+    execSync('npm install @sap/cds-lsp', { stdio: 'inherit', cwd: absDirectory  });
+    console.log("Successfully installed cds node modules");
   } catch (error) {
     console.error(`Error: ${error}`);
   }
