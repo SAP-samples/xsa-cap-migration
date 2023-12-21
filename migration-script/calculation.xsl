@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:Calculation="http://www.sap.com/ndb/BiModelCalculation.ecore">
+<xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:Calculation="http://www.sap.com/ndb/BiModelCalculation.ecore" xmlns:Privilege="http://www.sap.com/ndb/BiModelPrivilege.ecore">
     <xsl:output method="xml" encoding="UTF-8" omit-xml-declaration="no"/>
 
     <xsl:template match="@*|node()">
@@ -8,7 +8,6 @@
         </xsl:copy>
     </xsl:template>
 
-    <!-- to uppercase and dot to underscore -->
     <xsl:variable name="from" select="'abcdefghijklmnopqrstuvwxyz.'" />
     <xsl:variable name="to" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ_'" />
 
@@ -28,25 +27,15 @@
          </xsl:attribute>
     </xsl:template>
 
-    <!-- <xsl:template match="DataSource/@id">
-        <xsl:attribute name="id">
-            <xsl:call-template name="process">
-                <xsl:with-param name="text" select="."/>
-            </xsl:call-template>
-         </xsl:attribute>
-    </xsl:template> -->
-
     <xsl:template match="DataSource/@id">
     <xsl:attribute name="id">
         <xsl:choose>
-            <!-- If id contains 'Aggregation', keep it and call the process with string after 'Aggregation' -->
             <xsl:when test="starts-with(., 'Aggregation')">
                 <xsl:value-of select="'Aggregation'"/>
                 <xsl:call-template name="process">
                     <xsl:with-param name="text" select="substring-after(., 'Aggregation')"/>
                 </xsl:call-template>
             </xsl:when>
-            <!-- If id does not contain 'Aggregation', just pass id as is -->
             <xsl:otherwise>
                 <xsl:call-template name="process">
                     <xsl:with-param name="text" select="."/>
@@ -71,14 +60,6 @@
             </xsl:call-template>
          </xsl:attribute>
     </xsl:template>
-
-    <!-- <xsl:template match="attribute/@id">
-        <xsl:attribute name="id">
-            <xsl:call-template name="process">
-                <xsl:with-param name="text" select="."/>
-            </xsl:call-template>
-         </xsl:attribute>
-    </xsl:template> -->
 
     <xsl:template match="logicalModel/@id[not(contains(., 'Join') or contains(., 'Union') or contains(., 'Output') or contains(., 'Projection'))]">
         <xsl:attribute name="id">
@@ -107,33 +88,15 @@
    </xsl:attribute>
 </xsl:template>
 
-    <!-- <xsl:template match="input/@node">
-        <xsl:attribute name="node">
-            <xsl:call-template name="process">
-                <xsl:with-param name="text" select="."/>
-            </xsl:call-template>
-         </xsl:attribute>
-    </xsl:template> -->
-
-    <!-- <xsl:template match="input/@node[contains(., '#') or not(contains(., 'Join') or contains(., 'Union') or contains(., 'Output') or contains(., 'Projection'))]">
-        <xsl:attribute name="node">
-            <xsl:call-template name="process">
-                <xsl:with-param name="text" select="translate(., '#', '')"/>
-            </xsl:call-template>
-        </xsl:attribute>
-    </xsl:template> -->
-
     <xsl:template match="input/@node[contains(., '#') or not(contains(., 'Join') or contains(., 'Union') or contains(., 'Output') or contains(., 'Projection'))]">
     <xsl:attribute name="node">
         <xsl:choose>
-            <!-- If id contains 'Aggregation', keep it and call the process with string after 'Aggregation' -->
             <xsl:when test="starts-with(., 'Aggregation')">
                 <xsl:value-of select="'Aggregation'"/>
                 <xsl:call-template name="process">
                     <xsl:with-param name="text" select="substring-after(., 'Aggregation')"/>
                 </xsl:call-template>
             </xsl:when>
-            <!-- If node does not contain 'Aggregation', just pass node as is -->
             <xsl:otherwise>
                 <xsl:call-template name="process">
                     <xsl:with-param name="text" select="translate(., '#', '')"/>
@@ -151,13 +114,6 @@
          </xsl:copy>
     </xsl:template>
 
-    <!-- <xsl:template match="keyMapping/@columnObjectName">
-        <xsl:attribute name="columnObjectName">
-            <xsl:call-template name="process">
-                <xsl:with-param name="text" select="."/>
-            </xsl:call-template>
-         </xsl:attribute>
-    </xsl:template> -->
     <xsl:template match="keyMapping/@columnObjectName[not(contains(., 'Join') or contains(., 'Union') or contains(., 'Output') or contains(., 'Projection'))]">
         <xsl:attribute name="columnObjectName">
             <xsl:call-template name="process">
@@ -173,14 +129,6 @@
             </xsl:call-template>
         </xsl:attribute>
     </xsl:template>
-
-    <!-- <xsl:template match="measureMapping/@columnObjectName">
-        <xsl:attribute name="columnObjectName">
-            <xsl:call-template name="process">
-                <xsl:with-param name="text" select="."/>
-            </xsl:call-template>
-         </xsl:attribute>
-    </xsl:template> -->
 
     <xsl:template match="measureMapping/@columnObjectName[not(contains(., 'Join') or contains(., 'Union') or contains(., 'Output') or contains(., 'Projection'))]">
         <xsl:attribute name="columnObjectName">
@@ -222,24 +170,14 @@
          </xsl:attribute>
     </xsl:template>
 
-    <!-- <xsl:template match="targetVariable/@resourceUri">
-        <xsl:attribute name="resourceUri">
-            <xsl:call-template name="process">
-                <xsl:with-param name="text" select="."/>
-            </xsl:call-template>
-         </xsl:attribute>
-    </xsl:template> -->
-
     <xsl:template name="prefixAndTransform">
         <xsl:param name="prefix"/>
         <xsl:param name="text"/>
-        <!-- Call the 'process' template to transform the 'text' parameter -->
         <xsl:variable name="transformed_text">
             <xsl:call-template name="process">
                 <xsl:with-param name="text" select="$text"/>
             </xsl:call-template>
         </xsl:variable>
-        <!-- Return the prefix and the transformed text -->
         <xsl:value-of select="concat($prefix, $transformed_text)"/>
     </xsl:template>
 
@@ -288,14 +226,6 @@
             </xsl:call-template>
         </xsl:attribute>
     </xsl:template>
-
-    <!-- <xsl:template match="shape/@modelObjectName">
-        <xsl:attribute name="modelObjectName">
-            <xsl:call-template name="process">
-                <xsl:with-param name="text" select="."/>
-            </xsl:call-template>
-         </xsl:attribute>
-    </xsl:template> -->
 
     <xsl:template match="joinAttribute/@name">
         <xsl:attribute name="name">
@@ -357,7 +287,35 @@
          </xsl:attribute>
     </xsl:template>
 
-    <xsl:template match="filter">
+<xsl:template match="filter">
+    <xsl:copy>
+        <xsl:apply-templates select="@*|node()" />
+    </xsl:copy>
+</xsl:template>
+
+<xsl:template match="filter/text()">
+    <xsl:call-template name="process">
+        <xsl:with-param name="text" select="."/>
+    </xsl:call-template>
+</xsl:template>
+
+<xsl:template match="Privilege:analyticPrivilege/@id">
+        <xsl:attribute name="id">
+            <xsl:call-template name="process">
+                <xsl:with-param name="text" select="."/>
+            </xsl:call-template>
+         </xsl:attribute>
+    </xsl:template>
+
+ <xsl:template match="originInformationModelUri">
+        <xsl:copy>
+            <xsl:call-template name="process">
+                <xsl:with-param name="text" select="."/>
+            </xsl:call-template>
+         </xsl:copy>
+    </xsl:template>
+
+      <xsl:template match="modelUri">
         <xsl:copy>
             <xsl:call-template name="process">
                 <xsl:with-param name="text" select="."/>
@@ -376,38 +334,4 @@
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
-
-    <!-- <xsl:template name="quotedToUppercase">
-        <xsl:param name="text"/>
-            <xsl:analyze-string select="$text" regex='&quot;\w+&quot;'>
-                <xsl:matching-substring>
-                    <xsl:value-of select='upper-case(.)'/>
-                </xsl:matching-substring>
-                <xsl:non-matching-substring>
-                    <xsl:value-of select="."/>
-                </xsl:non-matching-substring>
-            </xsl:analyze-string>
-    </xsl:template> -->
-    <!-- <xsl:variable name="quote" select='"&quot;"'/>
-
-   <xsl:template match="filter|formula">
-        <xsl:copy>
-            <xsl:choose>
-                <xsl:when test="contains(., '&quot;')">
-                    <xsl:call-template name="process">
-                        <xsl:with-param name="text" select="substring-before(., '&quot;')"/>
-                    </xsl:call-template>
-                    <xsl:value-of select="$quote"/>
-                    <xsl:call-template name="process">
-                        <xsl:with-param name="text" select="substring-after(., '&quot;')"/>
-                    </xsl:call-template>
-                </xsl:when>
-                <xsl:otherwise>
-                    <xsl:call-template name="process">
-                        <xsl:with-param name="text" select="."/>
-                    </xsl:call-template>
-                </xsl:otherwise>
-            </xsl:choose>
-        </xsl:copy>
-    </xsl:template> -->
 </xsl:stylesheet>

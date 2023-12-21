@@ -1,7 +1,7 @@
 XSA TO CAP Migration: Automated Script
 =====================================
 ## Introduction:
-The Automated script is used to migrate applications from HANA CDS to CAP CDS. It is written in the NodeJS framework. The script will create a new CAP application and copy the database of the XSA application and modify it to support the CAP format. It covers the following conversions:
+The Automated script is used to migrate applications from HANA CDS to CAP CDS. It is written in the NodeJS framework. The script will create a new CAP application and copy the database of the XSA application and modify it to support the CAP format based on the option selected. It covers the following conversions:
 - Create an initial CAP application.
 - Based on the number of containers used in the source application, it will create multiple db folders in the CAP application.
 - Copy all the files from the respective database folder of the XSA Application to the db folders( Eg: db, db1 and so on) of the newly created CAP application.
@@ -18,15 +18,31 @@ The Automated script is used to migrate applications from HANA CDS to CAP CDS. I
     |BinaryFloat|Double|
 - Change `@OData.publish:true` with `@cds.autoexpose`.
 - Change `@Comment` with `@title`.
-- Change the Artifact table type to type or remove them as CAP CDS doesn't generate table types anymore. We will create a .hdbtabletype files for each table type definition in the later steps.
+- Create .hdbtabletype files for each table type definition.
 - Convert temporary entities to regular entities.
-- Move all the CDS files from their respective folders (Eg: src/) to the respective db folder of the CAP project. If cds files are inside the src folder then the deployment will fail because of where the "cds" plugin is. As per CAP, the cds files shouldn’t be in src folder because only the gen folder will push the data, but here in XSA application, all the artifacts will reside inside the src folder. So we have to move the cds files to the db folder for the deployment to work correctly.
+- Move all the CDS files from their respective folders (Eg: src/) to the respective db/cds folder of the CAP project and create a index.cds file in the src folder referring to these cds files.
 - Compile the cds files and create a log file.
+- Remove 'generated...;' and following in all lines
+- Format hdbrole and hdbtabledata.
+- Format hdbsynonymconfig
+- Modify the Simple using statements
+- Modify using notation for statements with ::
+- Modify the technical configurations and Structure privilege check
+- Remove Series Entity
+- Replace @Comment with /* */
+- Modify the annotation syntax
+- Remove Schema
+- Update .hdinamespace file with the proper configuration
 - Enhance Project Configuration for SAP HANA Cloud by running the command `cds add hana`.
 - Enhance Project Configuration for XSUAA by running the command `cds add xsuaa`.
 - Generate MTA deployment descriptor (mta.yaml) by running the command `cds add mta`.
 - Install the npm node modules in the CAP project by running the command `npm install`.
 - Rename the other Hana database artifacts to Hana Cloud supported format. That is entities should be in Uppercase and `.` to be replaced by `_`
+- Create a service.cds file with the service definition, Compile it and add redirect.
+- Copy the UI folder.
+- Remove empty directories.
+- Add odata V2 Support and Build tasks
+
 
 ## Requirements:
 1. We can use SAP BAS or VScode for script execution.
@@ -47,17 +63,8 @@ The Automated script is used to migrate applications from HANA CDS to CAP CDS. I
 ![parameters](./images/parameters.png)
 
 ## Note:
-- The script will not consider the namespace so if there is a .hdinamespace in your project, update it accordingly or as below:
-  ```
-  {
-    "name":    "",
-    "subfolder": "ignore"
-  }
-  ```
 - This script is used to migrate the SHINE demo application to CAP. For other projects, we have to adjust the calcview.xsl with the attributes used in the project before running the script.
-- The rename can be called for different Hana Artifacts. List the file extensions in the "config.json.tpl" file.
-  
-  **Note:** It doesnt work on hdbrole as it also renames the keywords. So if a new artifact other than the given list is added here, make sure to check if the rename is done correctly before deployment.
+- The rename can be called for different Hana Artifacts. List the file extensions in the [config.json.tpl](config.json.tpl) file.
 - For Multiple containers, mta.yaml has to be updated with service replacements. Example: [mta.yaml](https://github.com/SAP-samples/xsa-cap-migration/blob/main/hana-shine-cap/mta.yaml#L48-L56)
 
 ## License
