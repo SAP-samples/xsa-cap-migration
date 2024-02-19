@@ -1,0 +1,138 @@
+const shell = require("shelljs");
+const fsExtra = require("fs-extra");
+
+const modifyHdiNamespace = require("./modifyHdiNamespace");
+const convertHdbcdsToCds = require("./convertHdbcdsToCds");
+const calViewModification = require("./calViewModification");
+const changeDataTypes = require("./changeDataTypes");
+const formatRoleandTabledata = require("./formatRoleAndTabledata");
+const moveAndIndexCds = require("./moveAndIndexCds");
+const formatSynonymConfig = require("./formatSynonymConfig");
+const processFolder = require("./processFolder");
+const {
+  replaceSimpleUsingInFiles,
+  replaceUsingInFiles,
+} = require("./replaceFiles");
+const structuredPrivilege = require("./structuredPrivilege");
+const removeSeriesFunction = require("./removeSeriesFunction");
+const technicalConfig = require("./technicalConfig");
+const { commentAnnotation, annotationUpdate } = require("./annotationChanges");
+const updateSchema = require("./updateSchema");
+const findFiles = require("./findFiles");
+
+const setup_db = async (source, destination, option) => {
+  try {
+    console.log("Copying db artifacts to CAP project...");
+    copyDbFiles(source, destination);
+    console.log("Files copied!");
+    console.log("Modify the .hdinamespace files");
+    modifyHdiNamespace(destination);
+    console.log("Convert hdbcds to cds");
+    convertHdbcdsToCds(".", ".hdbcds", ".cds");
+    console.log("Using Calculation Views Modification");
+    calViewModification();
+    console.log("Modify the view notation");
+    modifyViewNotation();
+    console.log("Change Datatypes");
+    changeDataTypes();
+    console.log("Comment or remove the deprecated functionalities");
+    removeDeprecated();
+    console.log("Replace @OData.publish:true with @cds.autoexpose");
+    replaceOdata();
+    console.log("Move the cds files to db folder");
+    moveToDB();
+    console.log("Remove 'generated...;' and following in all lines");
+    removeGenerated();
+    console.log("Format hdbrole and hdbtabledata");
+    formatRoleandTabledata(".", option);
+    console.log("Format hdbsynonymconfig");
+    formatSynonymConfig(".");
+    console.log("Create hdbtabletype files");
+    processFolder(".");
+    console.log("Modify the Simple using statements");
+    replaceSimpleUsingInFiles(".");
+    console.log("Modify using notation for statements with ::");
+    replaceUsingInFiles(".");
+    console.log("Move the cds files to a cds folder and create an index.cds");
+    moveAndIndexCds(".", "./cds");
+    console.log("Modify the technical configurations");
+    technicalConfig(".", option);
+    console.log("Update the Structure privilege check");
+    structuredPrivilege(".");
+    console.log("Remove Series Entity");
+    removeSeriesFunction(".");
+    console.log("Replace @Comment with /* */");
+    commentAnnotation(".");
+    console.log("Modify the annotation syntax");
+    annotationUpdate("./cds");
+    console.log("Remove Schema");
+    updateSchema(".");
+    console.log("Compile the cds files and create a log file");
+    findFiles(".");
+    process.chdir("../");
+  } catch (e) {
+    console.error(`Failed with error ${e}`);
+  }
+};
+
+const copyDbFiles = (source, destination) => {
+  fsExtra.copySync(source, destination);
+};
+
+const modifyViewNotation = () => {
+  shell
+    .find(".")
+    .filter((file) => file.endsWith(".cds"))
+    .forEach((file) => {
+      shell.exec(
+        `sh -c "cat ${file} | sed -e 's/\\"/\\![/; s/\\"/]/' > ${file}.cases; mv ${file}.cases ${file};"`
+      );
+      shell.exec(
+        `sh -c "cat ${file} | sed -e 's/\\"/\\![/; s/\\"/]/' > ${file}.cases; mv ${file}.cases ${file};"`
+      );
+    });
+};
+
+const removeDeprecated = () => {
+  shell
+    .find(".")
+    .filter((file) => file.endsWith(".cds"))
+    .forEach((file) => {
+      shell.exec(
+        `sh -c "cat ${file} | sed -e 's@temporary Entity@\\/\\* temporary \\*\\/ Entity@g' > ${file}.cases; mv ${file}.cases ${file};"`
+      );
+    });
+};
+
+const replaceOdata = () => {
+  shell
+    .find(".")
+    .filter(function (file) {
+      return file.endsWith(".cds");
+    })
+    .forEach(function (file) {
+      shell.sed("-i", /@OData\.publish\s*:*\s*true/g, "@cds.autoexpose", file);
+    });
+};
+
+const moveToDB = () => {
+  shell
+    .find(".")
+    .filter((file) => file.endsWith(".cds"))
+    .forEach((file) => {
+      shell.mv(file, ".");
+    });
+};
+
+const removeGenerated = () => {
+  shell
+    .find(".")
+    .filter((file) => file.endsWith(".cds"))
+    .forEach((file) => {
+      shell.exec(
+        `sh -c "cat ${file} | sed -e 's/generated always.*;/;/g' > ${file}.cases; mv ${file}.cases ${file};"`
+      );
+    });
+};
+
+module.exports = setup_db;
