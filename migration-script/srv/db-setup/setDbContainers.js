@@ -19,8 +19,8 @@ const setup_db_containers = (
     } else if (CONTAINER_NUM > 1) {
       createFolderAndCopy(CAP_DIR, XSA_DIR, CONTAINER_NUM, paramArray, option);
     }
-    console.log("Exposing Tables and views");
-    createOdata(CAP_DIR);
+    // console.log("Exposing Tables and views");
+    // createOdata(CAP_DIR);
     execSync("cds add hana", { stdio: "inherit" });
     console.log("Successfully added hana");
     createDefaultsFolderAndFiles();

@@ -9,7 +9,8 @@ const formatSynonymConfig = (directory) => {
         (file) =>
           file.endsWith(".hdbsynonymconfig") ||
           file.endsWith(".hdbsynonym") ||
-          file.endsWith(".hdbroleconfig")
+          file.endsWith(".hdbroleconfig") ||
+          file.endsWith(".hdbsynonymtemplate")
       );
     for (const file of files) {
       let data = fs1.readFileSync(file, "utf8");
