@@ -115,7 +115,7 @@ The next step of the migration is to create a Target CAP application.
      |BinaryFloat|Double|
      
   9. Replace `@OData.publish:true` with `@cds.autoexpose`.
-  10. `@Comment` should be changed to [Doc comments](https://cap.cloud.sap/docs/cds/cdl#doc-comments-%E2%80%94). In the [migration-script](https://github.com/SAP-samples/xsa-cap-migration/blob/main/migration-script) script, we replace `@Comment` with `@title`.
+  10. `@Comment` should be changed to [Doc comments](https://cap.cloud.sap/docs/cds/cdl#doc-comments-%E2%80%94).
   11. Change the artifact table type to type or remove them as CAP CDS doesn't generate table types anymore. We will create a .hdbtabletype files for each table type definition in the later steps.
   12. Temporary entities are not supported in CAP. One way to reuse the existing table is to use [`@cds.persistence.exists`](https://cap.cloud.sap/docs/guides/databases#cds-persistence-exists) annotation for the entity in conjunction with [`.hdbdropcreatetable`](https://help.sap.com/docs/SAP_HANA_PLATFORM/3823b0f33420468ba5f1cf7f59bd6bd9/453d48e28f6747799546236b4b432e58.html). In the [migration-script](https://github.com/SAP-samples/xsa-cap-migration/blob/main/migration-script) script, we just convert these entities to regular entities.
   13. Move all the CDS files from their respective folders (Eg: src/) to the db folder of the CAP project. If cds files are inside the src folder then the deployment will fail because of where the "cds" plugin is. As per CAP, the cds files shouldn’t be in src folder because only the gen folder will push the data, but in the XSA application all the artifacts will reside inside the src folder. So we have to move the cds files to the db folder for the deployment to work correctly.
@@ -154,6 +154,8 @@ The next step of the migration is to create a Target CAP application.
      **Note:** During hdbtable deployment we will convert this to a Stored calculated element.
   2. Based on the advanced odata annotations, convert it to the [CAP structure](https://cap.cloud.sap/docs/advanced/odata#annotating-annotations).
   3. We can use `@cds.persistence.udf` for [User-Defined Functions in the Calculation view](https://cap.cloud.sap/docs/advanced/hana#calculated-views-and-user-defined-functions).
+  4. We can use the `@cds.persistence.exists` and `@cds.persistence.calcview` to expose the Calculation views. Eg: [datamodel.cds](https://github.com/SAP-samples/xsa-cap-migration/blob/main/hana-shine-cap/db/cds/datamodel.cds)
+  5. Modify the `using` statements in the cds files to point to the correct definitions.
   
   **Note:** For the SHINE example, you can find the modified CDS files in the [hdbcds](https://github.com/SAP-samples/xsa-cap-migration/blob/main/examples/hdbcds/db) examples folder.
 
@@ -260,7 +262,7 @@ As CAP expects unquoted identifiers with `.` replaced by `_`, we have to perform
      **Note:**  SAP CAP Model does not support .hdbtabletype files natively, as CAP is designed to be a database-agnostic model and platform. Instead, CAP encourages developers to use CDS for defining and working with data models. So .hdbtabletype usage should be carefully considered and properly justified as it might not integrate well with CAP environment.
   3. Update the other Hana artifacts to point to the new Database tables. 
 
-     **Note:** [migration-script](https://github.com/SAP-samples/xsa-cap-migration/blob/main/migration-script) will take care of renaming all of the Hana artifacts mentioned in the [list](https://github.com/SAP-samples/xsa-cap-migration/blob/main/migration-script/config.json.tpl#L15). It will also handle the renaming of the .hdbrole, .hdbsynonymconfig, .hdbsynonym , .hdbroleconfig and .hdbgrants. For the remaining artifacts manual rename is required at this point to make them point to the new DB artifacts.
+     **Note:** [migration-script](https://github.com/SAP-samples/xsa-cap-migration/blob/main/migration-script) will take care of renaming all of the Hana artifacts mentioned in the [list](https://github.com/SAP-samples/xsa-cap-migration/blob/main/migration-script/config.json.tpl#L15). It will also handle the renaming of the .hdbrole, .hdbsynonymconfig, .hdbsynonym , .hdbsynonymtemplate, .hdbroleconfig and .hdbgrants. For the remaining artifacts manual rename is required at this point to make them point to the new DB artifacts.
 
   4. If there is a .hdinamespace files in your project, update it as an empty namespace as below.
      ```
@@ -377,9 +379,8 @@ Migrate the SRV and the UI layer of the XSA Application to CAP.
   ### 5.1: Migration of the SRV layer:
   Migrate the srv module from xsodata and xsjs to CAP.
   1. For SRV module based on the xsodata service which is exposed and where the annotation `@odata.publish:true` is written, on top of the entities write your own services to expose them in srv module. One approach to verify if the services behave in an expected way is by test driven development approach. That is to write tests for the XSA application and then run the same tests for the deployed CAP application and verify that both behave in the same manner. Eg: [service.cds](https://github.com/SAP-samples/xsa-cap-migration/blob/main/hana-shine-cap/srv/service.cds)
-  2. We can use the `@cds.persistence.exists` and `@cds.persistence.calcview` to expose the Calculation views. Eg: [datamodel.cds](https://github.com/SAP-samples/xsa-cap-migration/blob/main/hana-shine-cap/db/cds/datamodel.cds)
-  3. If your existing XSA project is running with odatav2, then make the changes in your cap application by following the given [link](https://pages.github.tools.sap/cap/docs/advanced/odata#odata-v2-proxy-node).
-  4. Authentication and authorization can be migrated as per the business needs by following the CAP [documentation](https://cap.cloud.sap/docs/guides/authorization).
+  2. If your existing XSA project is running with odatav2, then make the changes in your cap application by following the given [link](https://pages.github.tools.sap/cap/docs/advanced/odata#odata-v2-proxy-node).
+  3. Authentication and authorization can be migrated as per the business needs by following the CAP [documentation](https://cap.cloud.sap/docs/guides/authorization).
             
   ### 5.2: Migration of the UI layer:
   We can reuse the same code for the UI layer. Just modify the OData routes and REST endpoints to point to the exposed CAP application services and endpoints Eg: [service.js](https://github.com/SAP-samples/xsa-cap-migration/blob/main/hana-shine-cap/srv/service.js).

@@ -17,7 +17,6 @@ The Automated script is used to migrate applications from HANA CDS to CAP CDS. I
     |UTCTimestamp|Timestamp|
     |BinaryFloat|Double|
 - Change `@OData.publish:true` with `@cds.autoexpose`.
-- Change `@Comment` with `@title`.
 - Create .hdbtabletype files for each table type definition.
 - Convert temporary entities to regular entities.
 - Move all the CDS files from their respective folders (Eg: src/) to the respective db/cds folder of the CAP project and create a index.cds file in the src folder referring to these cds files.
@@ -25,12 +24,9 @@ The Automated script is used to migrate applications from HANA CDS to CAP CDS. I
 - Remove 'generated...;' and following in all lines
 - Format hdbrole and hdbtabledata.
 - Format hdbsynonymconfig
-- Modify the Simple using statements
-- Modify using notation for statements with ::
 - Modify the technical configurations and Structure privilege check
 - Remove Series Entity
 - Replace @Comment with /* */
-- Modify the annotation syntax
 - Remove Schema
 - Update .hdinamespace file with the proper configuration
 - Enhance Project Configuration for SAP HANA Cloud by running the command `cds add hana`.
@@ -38,7 +34,6 @@ The Automated script is used to migrate applications from HANA CDS to CAP CDS. I
 - Generate MTA deployment descriptor (mta.yaml) by running the command `cds add mta`.
 - Install the npm node modules in the CAP project by running the command `npm install`.
 - Rename the other Hana database artifacts to Hana Cloud supported format. That is entities should be in Uppercase and `.` to be replaced by `_`
-- Create a service.cds file with the service definition, Compile it and add redirect.
 - Copy the UI folder.
 - Remove empty directories.
 - Add odata V2 Support and Build tasks

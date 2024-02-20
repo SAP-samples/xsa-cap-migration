@@ -27,7 +27,7 @@ const main = async () => {
     odataV2Support(CAP_DIR);
     buildTasks(CONTAINER_NUM);
     callcalculation(CURR_DIR, CAP_DIR);
-    compileAndRedirect(CAP_DIR);
+    //compileAndRedirect(CAP_DIR);
     formatcds(CAP_DIR);
   } catch (error) {
     console.error(`Error: ${error}`);
