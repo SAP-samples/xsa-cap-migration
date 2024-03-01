@@ -1,5 +1,6 @@
 const shell = require("shelljs");
 const fsExtra = require("fs-extra");
+const fs = require('fs');
 
 const modifyHdiNamespace = require("./modifyHdiNamespace");
 const convertHdbcdsToCds = require("./convertHdbcdsToCds");
@@ -16,7 +17,12 @@ const {
 const structuredPrivilege = require("./structuredPrivilege");
 const removeSeriesFunction = require("./removeSeriesFunction");
 const technicalConfig = require("./technicalConfig");
-const { commentAnnotation, annotationUpdate } = require("./annotationChanges");
+const {
+  commentAnnotation,
+  annotationUpdate,
+  removeAnnotation,
+  modifyUIAnnotation
+} = require("./annotationChanges");
 const updateSchema = require("./updateSchema");
 const findFiles = require("./findFiles");
 
@@ -29,8 +35,8 @@ const setup_db = async (source, destination, option) => {
     modifyHdiNamespace(destination);
     console.log("Convert hdbcds to cds");
     convertHdbcdsToCds(".", ".hdbcds", ".cds");
-    // console.log("Using Calculation Views Modification");
-    // calViewModification();
+    console.log("Using Calculation Views Modification");
+    calViewModification();
     console.log("Modify the view notation");
     modifyViewNotation();
     console.log("Change Datatypes");
@@ -49,10 +55,10 @@ const setup_db = async (source, destination, option) => {
     formatSynonymConfig(".");
     console.log("Create hdbtabletype files");
     processFolder(".");
-    // console.log("Modify the Simple using statements");
-    // replaceSimpleUsingInFiles(".");
-    // console.log("Modify using notation for statements with ::");
-    // replaceUsingInFiles(".");
+    console.log("Modify the Simple using statements");
+    replaceSimpleUsingInFiles(".");
+    console.log("Modify using notation for statements with ::");
+    replaceUsingInFiles(".");
     console.log("Move the cds files to a cds folder and create an index.cds");
     moveAndIndexCds(".", "./cds");
     console.log("Modify the technical configurations");
@@ -63,6 +69,10 @@ const setup_db = async (source, destination, option) => {
     removeSeriesFunction(".");
     console.log("Replace @Comment with /* */");
     commentAnnotation(".");
+    console.log("Remove annotations file");
+    removeAnnotation(".");
+    console.log("Changing @UI annotations");
+    modifyUIAnnotation(".");
     // console.log("Modify the annotation syntax");
     // annotationUpdate("./cds");
     console.log("Remove Schema");
@@ -80,16 +90,24 @@ const copyDbFiles = (source, destination) => {
 };
 
 const modifyViewNotation = () => {
+  const standaloneBeforeAsPattern = /([^a-zA-Z0-9_])"([^"]+)"(?=\s+as\s+)/g;
+  const asPattern = /(\S+)\s+as\s+"([^"]+)"/g;
+  const secondAsPattern = /"([^"]+)"\s+as\s+"([^"]+)"/g;
+  const dotPattern = /(\.\s*)"([^"]+)"/g;
+  const standalonePattern = /([^a-zA-Z0-9_])"([^"]+)"(?!\s+as\s+)/g;
   shell
     .find(".")
     .filter((file) => file.endsWith(".cds"))
     .forEach((file) => {
-      shell.exec(
-        `sh -c "cat ${file} | sed -e 's/\\"/\\![/; s/\\"/]/' > ${file}.cases; mv ${file}.cases ${file};"`
-      );
-      shell.exec(
-        `sh -c "cat ${file} | sed -e 's/\\"/\\![/; s/\\"/]/' > ${file}.cases; mv ${file}.cases ${file};"`
-      );
+      let content = fs.readFileSync(file, 'utf8');
+      const modifiedContent = content
+        .replace(standaloneBeforeAsPattern, '$1![$2]')
+        .replace(asPattern, '$1 as ![$2]')
+        .replace(secondAsPattern, '![$1] as ![$2]')
+        .replace(dotPattern, '$1![$2]')
+        .replace(standalonePattern, '$1 ![$2]');
+    
+      fs.writeFileSync(file, modifiedContent);
     });
 };
 

@@ -1,13 +1,13 @@
-const setup_cap_project = require("./srv/setupCapProject")
-const getParams = require("./srv/getParameters");
-const setup_db_containers = require("./srv/db-setup/setDbContainers");
-const mtaandxsuaa = require("./srv/mtaandxsuaa");
-const setup_app = require("./srv/setupApp");
-const odataV2Support = require("./srv/supportOdata");
-const buildTasks = require("./srv/addBuildTasks");
-const callcalculation = require("./srv/callCalculation");
-const compileAndRedirect = require("./srv/compileAndRedirect");
-const formatcds = require("./srv/formatCds");
+const setup_cap_project = require("./strategy/setupCapProject")
+const getParams = require("./strategy/getParameters");
+const setup_db_containers = require("./strategy/db-setup/setDbContainers");
+const mtaandxsuaa = require("./strategy/mtaandxsuaa");
+const setup_app = require("./strategy/setupApp");
+const odataV2Support = require("./strategy/supportOdata");
+const buildTasks = require("./strategy/addBuildTasks");
+const callcalculation = require("./strategy/callCalculation");
+const compileAndRedirect = require("./strategy/compileAndRedirect");
+const formatcds = require("./strategy/formatCds");
 
 const main = async () => {
   try {
