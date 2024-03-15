@@ -21,10 +21,10 @@ The Automated script is used to migrate applications from HANA CDS to CAP CDS. I
 - Convert temporary entities to regular entities.
 - Move all the CDS files from their respective folders (Eg: src/) to the respective db/cds folder of the CAP project and create a index.cds file in the src folder referring to these cds files.
 - Compile the cds files and create a log file.
-- Remove 'generated...;' and following in all lines
 - Format hdbrole and hdbtabledata.
 - Format hdbsynonymconfig
 - Modify the technical configurations and Structure privilege check
+- Add the inline `@sql.append` annotation for entities
 - Remove Series Entity
 - Replace @Comment with /* */
 - Remove Schema

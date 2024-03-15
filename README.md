@@ -134,8 +134,17 @@ The next step of the migration is to create a Target CAP application.
       @sql.append:'with structured privilege check'
       define view ItemView as SELECT from Item {};
       ```
-  18. Enhance Project Configuration for SAP HANA Cloud by running the command `cds add hana`.
-  19. Install the npm node modules in the CAP project by running the command `npm install`.
+  18. Add the inline `@sql.append` annotation
+      ```
+      entity MyEntity1 {
+         key ID : Integer;
+              a  : Integer;
+              b  : String; 
+              c  : Integer @sql.append: `generated always as a+b`;
+      };
+      ```
+  19. Enhance Project Configuration for SAP HANA Cloud by running the command `cds add hana`.
+  20. Install the npm node modules in the CAP project by running the command `npm install`.
   
   #### 1.2.2: Remove or Modify the Unsupported database features:
   In this step, we will manually remove or modify the unsupported database features in the CAP CDS files. Some of them are listed below

@@ -20,7 +20,8 @@ const createhdbtabletype = (file) => {
     let data = fs1.readFileSync(file, "utf8");
     let lines = data.trim().split("\n");
     let regexContext = /context\s(\w+)\s\{/i;
-    let regexTableType = /table\s+(type|Type)\s+(\w+)\s*{/i;
+    let regexTableType = /table\s+(type|Type)\s+(\w+)\s*/i;
+    let regexBraceStart = /^\s*\{\s*$/i;
     let regexEntityTable = /Entity\s+(\w+)\s*{/i;
     let regexBraceEnd = /};\s*$/i;
     let contexts = [];
@@ -39,6 +40,9 @@ const createhdbtabletype = (file) => {
       if (tableTypeMatch) {
         inTableTypeContext = true;
         tableName = tableTypeMatch[2];
+        if (regexBraceStart.test(lines[i + 1])) {
+          lines[i + 1] = lines[i + 1].replace("{", "");
+        }
         tableTypeLines.push(i);
         continue;
       }

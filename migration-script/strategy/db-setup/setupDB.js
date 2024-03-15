@@ -25,6 +25,7 @@ const {
 } = require("./annotationChanges");
 const updateSchema = require("./updateSchema");
 const findFiles = require("./findFiles");
+const inlineConfig = require("./inlineConfig");
 
 const setup_db = async (source, destination, option) => {
   try {
@@ -47,8 +48,8 @@ const setup_db = async (source, destination, option) => {
     replaceOdata();
     console.log("Move the cds files to db folder");
     moveToDB();
-    console.log("Remove 'generated...;' and following in all lines");
-    removeGenerated();
+    // console.log("Remove 'generated...;' and following in all lines");
+    // removeGenerated();
     console.log("Format hdbrole and hdbtabledata");
     formatRoleandTabledata(".", option);
     console.log("Format hdbsynonymconfig");
@@ -63,6 +64,8 @@ const setup_db = async (source, destination, option) => {
     moveAndIndexCds(".", "./cds");
     console.log("Modify the technical configurations");
     technicalConfig(".", option);
+    console.log("Modify inline configurations");
+    inlineConfig(".");
     console.log("Update the Structure privilege check");
     structuredPrivilege(".");
     console.log("Remove Series Entity");
@@ -142,15 +145,15 @@ const moveToDB = () => {
     });
 };
 
-const removeGenerated = () => {
-  shell
-    .find(".")
-    .filter((file) => file.endsWith(".cds"))
-    .forEach((file) => {
-      shell.exec(
-        `sh -c "cat ${file} | sed -e 's/generated always.*;/;/g' > ${file}.cases; mv ${file}.cases ${file};"`
-      );
-    });
-};
+// const removeGenerated = () => {
+//   shell
+//     .find(".")
+//     .filter((file) => file.endsWith(".cds"))
+//     .forEach((file) => {
+//       shell.exec(
+//         `sh -c "cat ${file} | sed -e 's/generated always.*;/;/g' > ${file}.cases; mv ${file}.cases ${file};"`
+//       );
+//     });
+// };
 
 module.exports = setup_db;
