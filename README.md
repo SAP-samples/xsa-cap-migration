@@ -290,7 +290,7 @@ As CAP expects unquoted identifiers with `.` replaced by `_`, we have to perform
 To retain the data in the container, we have to first deploy the CAP Application with the hdbcds format and then with hdbtable format.
   ### 3.1: CAP Application Deployment with hdbcds format:
   The hdbcds deployment will map the CAP entities to the existing entities in the SAP HANA 2.0 HDI container.
-  1. Open the package.json file in the root folder of the CAP application and change the deploy-format into "hdbcds" and kind as "hana" as below.
+  1. In the package.json file in the root folder of the CAP application, the deploy-format should be changed to "hdbcds" and kind as "hana" as below.
      ```
      "cds": {
         "hana": {
@@ -303,6 +303,7 @@ To retain the data in the container, we have to first deploy the CAP Application
         }
      }
      ```
+     **Note:** The migration script covers this part.
   2. Next, we need to remove the rename procedure and the default_access_role as its no longer required. Delete the RENAME_HDBCDS_TO_PLAIN.hdbprocedure from the "procedures" folder and also delete the "defaults" folder. Add the path of these files in the undeploy.json file like this:
      ```
      [
@@ -317,7 +318,7 @@ To retain the data in the container, we have to first deploy the CAP Application
   
   ### 3.2: CAP Application Deployment with hdbtable format:
   As Hana Cloud doesn't support hdbcds format, The hdbtable deployment will convert the mapped entities to hdbtables which can then be migrated to the Hana Cloud.
-  1. Open the package.json file in the root folder of the CAP application and change the deploy-format into "hdbtable".
+  1. In the package.json file in the root folder of the CAP application, the deploy-format should be changed to "hdbtable".
      ```
      "cds": {
         "hana": {
@@ -330,6 +331,10 @@ To retain the data in the container, we have to first deploy the CAP Application
         }
      }
      ```
+     **Note:** The migration script covers this part.
+     Once the script is running, provide the below parameters to execute the script.
+![parameters](./migration-script/images/parameters_optionThree.png)
+
   2. Change the Calculated field to a [Stored calculated element](https://cap.cloud.sap/docs/releases/jun23#calculated-elements-on-write) as below example
      ```
      Entity Employees {
