@@ -1,8 +1,30 @@
 const shell = require("shelljs");
 const fs1 = require("fs");
+const addDeployFormat = require("../addDeployFormat");
 
 const technicalConfig = (directory, option) => {
   try {
+    if (option == 3) {
+      var cap_db_dest = directory + "/db";
+      process.chdir(cap_db_dest);
+      const files = shell.find(".").filter((file) => file.endsWith(".cds"));
+      files.forEach((file) => {
+        let fileData = fs1.readFileSync(file, "utf8");
+        let updatedFileData = fileData.replace(
+          /@sql\.append:\s+`{3}\s*technical configuration \{\s*([\s\S]*?)\s*;\s*\}\s*`{3}/g,
+          (match, p1) => {
+            let techConfigValue = p1.trim();
+            return `@sql.append: \`\`\`\n${techConfigValue}\n\`\`\``;
+          }
+        );
+        fs1.writeFileSync(file, updatedFileData, "utf8");
+      });
+      process.chdir("../");
+      addDeployFormat(option);
+      console.log("Successfully changed hdbcds to hdbtable");
+      process.exit(0);
+    }
+
     const files = shell.find(directory).filter((file) => file.endsWith(".cds"));
     files.forEach(function (file) {
       let fileData = fs1.readFileSync(file, "utf8");
@@ -31,12 +53,16 @@ const technicalConfig = (directory, option) => {
                 .replace(/column\s*store[\s\S]*?;/gi, "")
                 .replace(/row\s*store[\s\S]*?;/gi, "")
                 .trim();
-              techConfigValue = techConfigValue.replace(/\;\s*$/, "");
-              techConfigValue = techConfigValue.replace(/\s\s+/g, " ");
+              const techConfigValueArray = techConfigValue.split(";");
+              techConfigValue = techConfigValue.replace(/\;/g, "\n");
               if (techConfigValue === "") {
                 return `\n${p1}`;
               } else {
-                return `@sql.append: \`${techConfigValue}\`\n${p1}`;
+                if (techConfigValueArray.length <= 1) {
+                  return `@sql.append: \`${techConfigValue}\`\n${p1}`;
+                } else {
+                  return `@sql.append: \`\`\`\n ${techConfigValue}\n\`\`\`\n${p1}`;
+                }
               }
             }
           }
