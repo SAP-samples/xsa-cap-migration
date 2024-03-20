@@ -13,7 +13,7 @@ const mtaandxsuaa = async (directory) => {
       let absDirectory1 = path.resolve(directory);
       console.log("node_modules directory does not exist, installing...");
       execSync("npm install", { stdio: "inherit", cwd: absDirectory });
-      execSync("npm i @sap/cds-lsp",{ stdio: "inherit", cwd: absDirectory })
+      execSync("npm install -g @sap/cds-lsp",{ stdio: "inherit", cwd: absDirectory })
       console.log("Successfully installed node packages");
     } else {
       console.log("node_modules directory exists.");
