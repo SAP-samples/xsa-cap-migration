@@ -11,7 +11,7 @@ The Automated script is used to migrate applications from HANA CDS to CAP CDS. I
 
 - Converting the file extensions from "hdbcds" files into "cds" for CAP compliance.
   
-- As part of the transition to CAP compliant format, the notation in view definitions should be modified from "" to ![]. This specific delimiter enhances the reliability of processing in CAP CDS.
+- As part of the transition to CAP compliant format, the notation in view definitions should be modified from "" to ![]. This specific [delimiter](https://cap.cloud.sap/docs/cds/cdl#delimited-identifiers) enhances the reliability of processing in CAP CDS.
   
 - Coverts HANA CDS Datatypes to CAP CDS Datatypes.
        | HANA CDS | CAP CDS |
