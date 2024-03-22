@@ -66,34 +66,65 @@ const commentAnnotation = (directory) => {
 
 const removeAnnotation = (directory) => {
   try {
-    const files = shell
-      .find(directory)
-      .filter((file) => file.endsWith("annotations.cds"));
-    files.forEach(function (file) {
-      fs1.unlink(file, function (err) {
-        if (err) throw err;
-        console.log("annotations.cds was deleted");
-      });
-    });
     const cdsFiles = shell
       .find(directory)
       .filter((file) => file.endsWith(".cds"));
     cdsFiles.forEach(function (file) {
       let fileData = fs1.readFileSync(file, "utf8");
-      let regex = /(?<=\n)[^\n]*from\s'\.\/annotations';[^\n]*(?=\n)/g;
+      let regex = /annotation\b\s\w+:\s\w+\(\d+\)\s*;?/g;
       let updatedData = fileData.replace(regex, "");
       fs1.writeFileSync(file, updatedData, "utf8");
     });
-    const indexCds = shell
-      .find("../")
-      .filter((file) => file.endsWith("index.cds"));
-    indexCds.forEach(function (file) {
+
+    const getWords = shell
+      .find(directory)
+      .filter((file) => file.endsWith(".cds"));
+    let wordsArray = [];
+    getWords.forEach(function (file) {
       let fileData = fs1.readFileSync(file, "utf8");
-      let updatedData = fileData.replace(
-        /using\sfrom\s'\.\/cds\/annotations';/g,
-        ""
-      );
-      fs1.writeFileSync(file, updatedData, "utf8");
+      let matches = fileData.match(/annotation\s+(.*?)\s*\{/g);
+
+      if (matches) {
+        matches.forEach((match) => {
+          let words = match
+            .replace(/annotation\s+|\s*\{/g, "")
+            .trim()
+            .split(/\s+/);
+          wordsArray.push(...words);
+        });
+      }
+    });
+
+    const cdsFileUsing = shell.find("../").filter((file) => file.endsWith(".cds"));
+    cdsFileUsing.forEach(function (file) {
+      let fileData2 = fs1.readFileSync(file, "utf8");
+
+      wordsArray.forEach((word) => {
+        let regex = new RegExp(
+          `using .*?${word}.*? as \\w+ from './.*?';`,
+          "g"
+        );
+        fileData2 = fileData2.replace(regex, "");
+      });
+
+      fs1.writeFileSync(file, fileData2, "utf8");
+    });
+
+    function removeAnnotationBlocks(text, wordsArray) {
+      for (let word of wordsArray) {
+        const pattern = new RegExp(
+          `annotation\\s+${word}\\s*\\{(?:[^{}]*|\\{(?:[^{}]*|\\{(?:[^{}]*|\\{[^{}]*\\})*\\})*\\})*\\};?`,
+          "gs"
+        );
+        text = text.replace(pattern, "");
+      }
+      return text;
+    }
+    const annotationFiles = shell.find("../").filter((file) => file.endsWith(".cds"));
+    annotationFiles.forEach(function (file) {
+      let fileData2 = fs1.readFileSync(file, "utf8");
+      let cleanedText = removeAnnotationBlocks(fileData2, wordsArray);
+      fs1.writeFileSync(file, cleanedText, "utf8");
     });
   } catch (error) {
     console.error(`Error: ${error}`);
