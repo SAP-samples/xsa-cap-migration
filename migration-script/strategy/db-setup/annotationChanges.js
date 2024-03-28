@@ -66,6 +66,7 @@ const commentAnnotation = (directory) => {
 
 const removeAnnotation = (directory) => {
   try {
+    //remove annotations that are of the format `annotation MyAnnotation1: String(40);`
     const cdsFiles = shell
       .find(directory)
       .filter((file) => file.endsWith(".cds"));
@@ -76,6 +77,7 @@ const removeAnnotation = (directory) => {
       fs1.writeFileSync(file, updatedData, "utf8");
     });
 
+    //getting the names of all annotations
     const getWords = shell
       .find(directory)
       .filter((file) => file.endsWith(".cds"));
@@ -95,6 +97,7 @@ const removeAnnotation = (directory) => {
       }
     });
 
+    //removing usages of the previously fetched annotations
     const cdsFileUsing = shell.find("../").filter((file) => file.endsWith(".cds"));
     cdsFileUsing.forEach(function (file) {
       let fileData2 = fs1.readFileSync(file, "utf8");
@@ -110,8 +113,10 @@ const removeAnnotation = (directory) => {
       fs1.writeFileSync(file, fileData2, "utf8");
     });
 
+    //removing annotation bloack (annotations with nested braces)
     function removeAnnotationBlocks(text, wordsArray) {
       for (let word of wordsArray) {
+        //regex pattern to match all the nested blocks
         const pattern = new RegExp(
           `annotation\\s+${word}\\s*\\{(?:[^{}]*|\\{(?:[^{}]*|\\{(?:[^{}]*|\\{[^{}]*\\})*\\})*\\})*\\};?`,
           "gs"
