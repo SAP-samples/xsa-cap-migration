@@ -31,6 +31,12 @@ const createhdbtabletype = (file) => {
     let inTableTypeContext = false;
     for (let i = 0; i < lines.length; i++) {
       let line = lines[i];
+      if (/context\s+\w+\s*\{table\s+(type|Type)\s+(\w+)\s*\{/i.exec(line)) {
+        let splitString = lines[i].split(/(table type)/i);
+        let tableString = splitString[1] + splitString[2];
+        lines.splice(i + 1, 0, tableString);
+        lines[i] = lines[i].replace(/table\s+(type|Type)\s+\w+\s*\{/, "");
+      }
       let contextMatch = regexContext.exec(line);
       if (contextMatch) {
         contexts.push(contextMatch[1]);
@@ -43,6 +49,7 @@ const createhdbtabletype = (file) => {
         if (regexBraceStart.test(lines[i + 1])) {
           lines[i + 1] = lines[i + 1].replace("{", "");
         }
+        lines[i]= lines[i].replace("table","")
         tableTypeLines.push(i);
         continue;
       }
@@ -70,7 +77,7 @@ const createhdbtabletype = (file) => {
         }
       }
     }
-    lines = lines.filter((_, index) => !tableTypeLines.includes(index));
+    //lines = lines.filter((_, index) => !tableTypeLines.includes(index));
     fs1.writeFileSync(file, lines.join("\n"), "utf8");
 
     if (tableName.length > 0 && args.length > 0) {

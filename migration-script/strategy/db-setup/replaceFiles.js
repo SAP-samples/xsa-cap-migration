@@ -32,20 +32,10 @@ const replaceUsingInFiles = (directory) => {
         const data = fs1.readFileSync(file, "utf8");
         let regex = /(using\s+)([^:]+)::([^.\n]+)(\.([^;\n]+))?;/g;
         let result = data.replace(regex, function (_, p1, p2, p3, p4, p5) {
-          p2 = p2
-            .split("![")
-            .map((part, index) => {
-              if (index === 0) return part;
-              else return "![" + part.replace(/\./g, "_");
-            })
-            .join("")
-            .replace("![", "")
-            .toUpperCase();
-          p3 = p3.split("]")[0];
           if (p5) {
-            return `${p1}${p2}_${p3}${p4} as ${p5} from './${p3}';`;
+            return `${p1}${p2}.${p3}${p4} as ${p5} from './${p3}';`;
           } else {
-            return `${p1}${p2}_${p3} as ${p3} from './${p3}';`;
+            return `${p1}${p2}.${p3} as ${p3} from './${p3}';`;
           }
         });
         fs1.writeFileSync(file, result, "utf8");

@@ -29,12 +29,12 @@ const technicalConfig = (directory, option) => {
     files.forEach(function (file) {
       let fileData = fs1.readFileSync(file, "utf8");
       if (
-        /((?:\/\*.+\*\/\s)*Entity[\s\S]*?})\s+technical configuration\s+\{[\s\S]*?\}/.test(
+        /((?:\/\*.+\*\/\s)*Entity[\s\S]*?})\s+technical configuration\s+\{[\s\S]*?\}/i.test(
           fileData
         )
       ) {
         fileData = fileData.replace(
-          /((?:\/\*.+\*\/\s)*Entity[\s\S]*?})\s+technical configuration\s+\{([\s\S]*?)\}/g,
+          /((?:\/\*.+\*\/\s)*Entity[\s\S]*?})\s+technical configuration\s+\{([\s\S]*?)\}/gi,
           (match, p1, p2) => {
             let techConfigValue;
             if (option == 1) {
