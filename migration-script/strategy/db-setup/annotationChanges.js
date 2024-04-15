@@ -72,7 +72,7 @@ const removeAnnotation = (directory) => {
       .filter((file) => file.endsWith(".cds"));
     cdsFiles.forEach(function (file) {
       let fileData = fs1.readFileSync(file, "utf8");
-      let regex = /annotation\b\s\w+:\s\w+\(\d+\)\s*;?/g;
+      let regex = /annotation\b\s\w+\s*:\s*\w+\(\d+\)\s*;?/g
       let updatedData = fileData.replace(regex, "");
       fs1.writeFileSync(file, updatedData, "utf8");
     });
@@ -113,7 +113,7 @@ const removeAnnotation = (directory) => {
       fs1.writeFileSync(file, fileData2, "utf8");
     });
 
-    //removing annotation bloack (annotations with nested braces)
+    //removing annotation block (annotations with nested braces)
     function removeAnnotationBlocks(text, wordsArray) {
       for (let word of wordsArray) {
         //regex pattern to match all the nested blocks

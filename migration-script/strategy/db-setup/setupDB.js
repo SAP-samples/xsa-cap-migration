@@ -28,6 +28,7 @@ const findFiles = require("./findFiles");
 const convertHdbtableToCds = require("./convertHdbtableToCds");
 const convertHdbviewToCds = require("./convertHdbviewToCds");
 const inlineConfig = require("./inlineConfig");
+const formatcds = require("../formatCds")
 
 const setup_db = async (source, destination, option) => {
   try {
@@ -40,6 +41,12 @@ const setup_db = async (source, destination, option) => {
     convertHdbcdsToCds(".", ".hdbcds", ".cds");
     console.log("Convert hdbtable to cds");
     convertHdbtableToCds(".", ".hdbtable")
+    console.log("Comment or remove the deprecated functionalities");
+    removeDeprecated();
+    console.log("format cds files")
+    formatcds(destination)
+    console.log("Convert hdbtable to cds");
+    convertHdbtableToCds(".", ".hdbtable")
     // console.log("Convert hdbviews to cds");
     // convertHdbviewToCds(".", ".hdbview")
     console.log("Using Calculation Views Modification");
@@ -48,8 +55,6 @@ const setup_db = async (source, destination, option) => {
     modifyViewNotation();
     console.log("Change Datatypes");
     changeDataTypes();
-    console.log("Comment or remove the deprecated functionalities");
-    removeDeprecated();
     console.log("Replace @OData.publish:true with @cds.autoexpose");
     replaceOdata();
     console.log("Move the cds files to db folder");

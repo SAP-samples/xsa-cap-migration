@@ -19,11 +19,13 @@ const createhdbtabletype = (file) => {
   try {
     let data = fs1.readFileSync(file, "utf8");
     let lines = data.trim().split("\n");
+    let regexNamespace = /namespace\s+([\w\d_.]+)/i;
     let regexContext = /context\s(\w+)\s\{/i;
     let regexTableType = /table\s+(type|Type)\s+(\w+)\s*/i;
     let regexBraceStart = /^\s*\{\s*$/i;
     let regexEntityTable = /Entity\s+(\w+)\s*{/i;
     let regexBraceEnd = /};\s*$/i;
+    let namespaces = [];
     let contexts = [];
     let tableName = "";
     let args = [];
@@ -31,25 +33,24 @@ const createhdbtabletype = (file) => {
     let inTableTypeContext = false;
     for (let i = 0; i < lines.length; i++) {
       let line = lines[i];
-      if (/context\s+\w+\s*\{table\s+(type|Type)\s+(\w+)\s*\{/i.exec(line)) {
-        let splitString = lines[i].split(/(table type)/i);
-        let tableString = splitString[1] + splitString[2];
-        lines.splice(i + 1, 0, tableString);
-        lines[i] = lines[i].replace(/table\s+(type|Type)\s+\w+\s*\{/, "");
+      let namespaceMatch = regexNamespace.exec(line);
+      if (namespaceMatch) {
+        namespaces.push(namespaceMatch[1]);
+        continue;
       }
       let contextMatch = regexContext.exec(line);
       if (contextMatch) {
         contexts.push(contextMatch[1]);
         continue;
       }
-      let tableTypeMatch = regexTableType.exec(line);
+      let tableTypeMatch = regexTableType.exec(lines[i - 1] + lines[i]);
       if (tableTypeMatch) {
         inTableTypeContext = true;
         tableName = tableTypeMatch[2];
         if (regexBraceStart.test(lines[i + 1])) {
           lines[i + 1] = lines[i + 1].replace("{", "");
         }
-        lines[i]= lines[i].replace("table","")
+        lines[i - 1] = lines[i - 1].replace("table", "");
         tableTypeLines.push(i);
         continue;
       }
@@ -59,7 +60,7 @@ const createhdbtabletype = (file) => {
       }
       if (inTableTypeContext) {
         if (regexBraceEnd.test(line)) {
-          processTableType(contexts, tableName, args);
+          processTableType(namespaces, contexts, tableName, args);
           args = [];
           tableName = "";
           tableTypeLines.push(i);
@@ -81,7 +82,7 @@ const createhdbtabletype = (file) => {
     fs1.writeFileSync(file, lines.join("\n"), "utf8");
 
     if (tableName.length > 0 && args.length > 0) {
-      processTableType(contexts, tableName, args);
+      processTableType(namespaces, contexts, tableName, args);
     }
   } catch (error) {
     console.error(`Error: ${error}`);
@@ -114,7 +115,7 @@ const checkAndDeleteFile = (file) => {
   }
 };
 
-const processTableType = (contexts, tableName, args) => {
+const processTableType = (namespaces, contexts, tableName, args) => {
   try {
     let dir = path.join(".", "src", "types");
     if (!fs1.existsSync(dir)) {
@@ -124,6 +125,12 @@ const processTableType = (contexts, tableName, args) => {
       contexts.length > 0
         ? contexts[contexts.length - 1].toUpperCase() + "_"
         : "";
+    if (namespaces.length > 0) {
+      prefix =
+        namespaces[namespaces.length - 1].toUpperCase().replace(/\./g, "_") +
+        "_" +
+        prefix;
+    }
     let newTypeName = `"${prefix}${tableName.toUpperCase()}"`;
     let newContent = `TYPE ${newTypeName} AS TABLE (\n\t${args.join(
       ",\n\t"
