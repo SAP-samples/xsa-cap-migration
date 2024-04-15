@@ -39,8 +39,6 @@ const setup_db = async (source, destination, option) => {
     modifyHdiNamespace(destination);
     console.log("Convert hdbcds to cds");
     convertHdbcdsToCds(".", ".hdbcds", ".cds");
-    console.log("Convert hdbtable to cds");
-    convertHdbtableToCds(".", ".hdbtable")
     console.log("Comment or remove the deprecated functionalities");
     removeDeprecated();
     console.log("format cds files")
