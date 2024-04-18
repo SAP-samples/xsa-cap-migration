@@ -15,30 +15,35 @@ const inlineConfig = (directory) => {
     const files = shell.find(directory).filter((file) => file.endsWith(".cds"));
     files.forEach(function (file) {
       let fileData = fs1.readFileSync(file, "utf8");
-      const lines = fileData.split("\n");
-      for (let i = 0; i < lines.length; i++) {
-        dataTypes.forEach((type) => {
-          let regex = new RegExp(
-            ":\\s*" + type + "\\s*(\\(.+?\\))?" + "\\s*([^;]*);",
-            "gi"
-          );
-          lines[i] = lines[i].replace(regex, function (match, p1, p2) {
+      dataTypes.forEach((type) => {
+        const regex = new RegExp(
+          ":\\s*" + type + "\\s*(\\(.+?\\))?" + "\\s*([^;]*);",
+          "gi"
+        );
+
+        fileData = fileData.replace(
+          regex,
+          (match, captureGroup1, captureGroup2) => {
             if (
-              p2 !== "" &&
-              !p2.includes("default") &&
-              !p2.includes("null") &&
-              !/^=/.test(p2.trim()) &&
-              !/^\d/.test(p2.trim())
+              !captureGroup2.includes("default") &&
+              !captureGroup2.includes("enum") &&
+              captureGroup2 !== "" &&
+              !captureGroup2.includes("select") &&
+              !captureGroup2.includes("null") &&
+              !/^=/.test(captureGroup2.trim()) &&
+              !/^\d/.test(captureGroup2.trim())
             ) {
-              return `: ${type}${
-                p1 ? " " + p1 : ""
-              } @sql.append: \`${p2.trim()}\`;`;
+              if (captureGroup1 !== undefined) {
+                return `: ${type}${captureGroup1} @sql.append:\`${captureGroup2}\`;`;
+              } else {
+                return `: ${type} @sql.append:\`${captureGroup2}\`;`;
+              }
+            } else {
+              return match;
             }
-            return match;
-          });
-        });
-      }
-      fileData = lines.join("\n");
+          }
+        );
+      });
       fs1.writeFileSync(file, fileData, "utf8");
     });
   } catch (error) {

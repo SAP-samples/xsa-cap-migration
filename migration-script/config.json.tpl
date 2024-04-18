@@ -37,7 +37,7 @@
       ]
     }
   ],
-  "scanPath": "{CAP_DIR}/**",
-  "ignorePaths": ["node_modules/**"],
+  "scanPath": "{CAP_DIR}",
+  "ignorePaths": ["**/node_modules/**"],
   "fileExt": ""
 }
