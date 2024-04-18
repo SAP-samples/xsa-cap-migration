@@ -55,9 +55,11 @@ The Automated script is used to migrate applications from HANA CDS to CAP CDS. I
   
 - Renaming the annotations.
 
+- Converting ".hdbtable" into cds proxy entities "@cds.persistence.exists"
+
 ## Features not covered in Migration Script and Limitations:
 
-- Creating proxy cds for “.hdbtable”, “.hdbview”, “.hdbcalculationview”
+- Creating proxy cds for  “.hdbview”, “.hdbcalculationview”
   
 - Converting xsodata into cap service definition
   
