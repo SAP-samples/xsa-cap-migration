@@ -67,7 +67,7 @@ The Automated script is used to migrate applications from HANA CDS to CAP CDS. I
   
 - Creating proxy cds for cross container schemas
   
-- Unsupported datatypes in calculation views ex: since the date() function is not supported in SAP HANA Cloud need to converted into daydate().
+- Unsupported datatypes in calculation views ex: since the date() function is not supported in SAP HANA Cloud need to converted into daydate().[Limitations](https://community.sap.com/t5/technology-blogs-by-sap/sap-hana-cloud-migration-common-code-remediations-after-conversion-of-xs/ba-p/13550738)
   
 - SQL syntax changes in procedure is not integrated ex: UPDATE FROM has to be changed into MERGE INTO, TRUNCATE statement with a DELETE FROM statement
   
