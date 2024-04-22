@@ -25,10 +25,10 @@ const {
 } = require("./annotationChanges");
 const updateSchema = require("./updateSchema");
 const findFiles = require("./findFiles");
-const convertHdbtableToCds = require("./convertHdbtableToCds");
-const convertHdbviewToCds = require("./convertHdbviewToCds");
+const {convertHdbtableToCds} = require("./convertHdbtableToCds");
 const inlineConfig = require("./inlineConfig");
-const formatcds = require("../formatCds")
+const formatcds = require("../formatCds");
+const convertCalcviewToCds = require("./convertCalcviewToCds");
 
 const setup_db = async (source, destination, option) => {
   try {
@@ -39,14 +39,14 @@ const setup_db = async (source, destination, option) => {
     modifyHdiNamespace(destination);
     console.log("Convert hdbcds to cds");
     convertHdbcdsToCds(".", ".hdbcds", ".cds");
+    console.log("Convert hdbtable to cds");
+    convertHdbtableToCds(".", ".hdbtable")
+    console.log("Convert hdbcalculationview to cds");
+    convertCalcviewToCds(".", ".hdbcalculationview",destination)
     console.log("Comment or remove the deprecated functionalities");
     removeDeprecated();
     console.log("format cds files")
     formatcds(destination)
-    console.log("Convert hdbtable to cds");
-    convertHdbtableToCds(".", ".hdbtable")
-    // console.log("Convert hdbviews to cds");
-    // convertHdbviewToCds(".", ".hdbview")
     console.log("Using Calculation Views Modification");
     calViewModification();
     console.log("Modify the view notation");
