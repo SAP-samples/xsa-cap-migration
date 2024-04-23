@@ -201,8 +201,13 @@ const convertToCds = (data) =>{
     const columnLine = lines[i].trim().replace(/COMMENT.*$/, '');
     if(columnLine !== ""){
       let matches = columnLine.split(" ").filter(Boolean);
-      if(matches.length > 1 && sqlDataTypes.includes(dataTypesCleanUp(matches[1]).split('(')[0].replace(/['"]+/g, '').toUpperCase().trim())){
+      if(matches.length > 1 && sqlDataTypes.includes(matches[1].replace(/['"]+/g, '').toUpperCase().trim())){
         let name = matches[0].replace(/"/g, '').replace(/\)+/, '').trim().replace(/\./g, '_').toUpperCase();
+        let matchesType = matches[1]
+        let lengthTypesReg = /\(\d+\)/g;
+        if(matches[2]!==undefined && matches[2].match(lengthTypesReg)) {
+          matchesType = matchesType + matches[2]
+        }
         if (name !== "COMMENT") {
             for(let j=0;j<keyNamesArray.length;j++){
               if (name === keyNamesArray[j]) {
@@ -211,7 +216,7 @@ const convertToCds = (data) =>{
                 break
               }
             }
-          const type = convertDbTypes(matches[1].toUpperCase());
+          const type = convertDbTypes(matchesType.toUpperCase());
           columns.push({name, type});
         }
       }
