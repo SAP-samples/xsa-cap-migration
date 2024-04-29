@@ -33,6 +33,23 @@
               [".", "_"]
             ]
           }
+        },
+         {
+            "name": "CharReplacementCS",
+            "config": {
+                "regex": "CS_\\w+"
+            }
+        }
+      ]
+    },
+    {
+      "fileExts": ["hdbtabletype", "hdbindex", "hdbview", "hdbtable", "hdbsequence", "hdbprocedure", "hdbtablefunction", "hdbfunction"],
+      "strategies": [
+         {
+            "name": "CharReplacementCS",
+            "config": {
+                "regex": "CS_\\w+"
+            } 
         }
       ]
     }

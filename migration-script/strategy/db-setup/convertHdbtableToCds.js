@@ -201,7 +201,7 @@ const convertToCds = (data) =>{
     const columnLine = lines[i].trim().replace(/COMMENT.*$/, '');
     if(columnLine !== ""){
       let matches = columnLine.split(" ").filter(Boolean);
-      if(matches.length > 1 && sqlDataTypes.includes(matches[1].replace(/['"]+/g, '').toUpperCase().trim())){
+      if(matches.length > 1 && sqlDataTypes.includes(dataTypesCleanUp(matches[1]).split('(')[0].replace(/['"]+/g, '').toUpperCase().trim())){
         let name = matches[0].replace(/"/g, '').replace(/\)+/, '').trim().replace(/\./g, '_').toUpperCase();
         let matchesType = matches[1]
         let lengthTypesReg = /\(\d+\)/g;
