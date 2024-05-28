@@ -12,7 +12,7 @@
       ]
     },
     {
-      "fileExts": ["hdbconstraint", "hdbindex", "hdbview", "hdbtable", "hdbsequence", "hdbprocedure", "hdbtablefunction", "hdbfunction", "hdbstructuredprivilege", "hdblibrary"],
+      "fileExts": ["hdbconstraint", "hdbindex", "hdbview", "hdbsequence", "hdbprocedure", "hdbtablefunction", "hdbfunction", "hdbstructuredprivilege", "hdblibrary","hdbtrigger"],
       "strategies": [
         {
           "name": "CharReplacementUppercase",
@@ -33,6 +33,17 @@
               [".", "_"]
             ]
           }
+        }
+      ]
+    },
+    {
+      "fileExts": ["hdbtabletype", "hdbindex", "hdbview", "hdbtable", "hdbsequence", "hdbprocedure", "hdbtablefunction", "hdbfunction"],
+      "strategies": [
+         {
+            "name": "CharReplacementCS",
+            "config": {
+                "regex": "CS_\\w+"
+            } 
         }
       ]
     }

@@ -2,6 +2,11 @@ const shell = require("shelljs");
 const fs1 = require("fs");
 const path = require("path");
 
+let reportHdiNamespaceFiles = []
+const reportHdiNamespaceModify =()=>{
+  return reportHdiNamespaceFiles
+}
+
 const modifyHdiNamespace = (destination) => {
   process.chdir(destination);
   try {
@@ -9,6 +14,7 @@ const modifyHdiNamespace = (destination) => {
       .find(".")
       .filter((file) => path.basename(file) === ".hdinamespace")
       .forEach((file) => {
+        reportHdiNamespaceFiles.push(file)
         let fileContent = fs1.readFileSync(file, "utf8");
         let contentJSON = JSON.parse(fileContent);
         if (Array.isArray(contentJSON)) {
@@ -28,4 +34,4 @@ const modifyHdiNamespace = (destination) => {
   }
 };
 
-module.exports = modifyHdiNamespace;
+module.exports = {modifyHdiNamespace,reportHdiNamespaceModify};

@@ -4,7 +4,7 @@ const fs1 = require("fs");
 const { execSync } = require("child_process");
 const path = require("path");
 
-const setup_db_containers = (
+ const setup_db_containers = async (
   CAP_DIR,
   XSA_DIR,
   CONTAINER_NUM,
@@ -15,7 +15,7 @@ const setup_db_containers = (
     if (CONTAINER_NUM == 1) {
       var haas_db_src = XSA_DIR + "/" + paramArray[0];
       var cap_db_dest = CAP_DIR + "/db";
-      setup_db(haas_db_src, cap_db_dest, option);
+      await setup_db(haas_db_src, cap_db_dest, option);
     } else if (CONTAINER_NUM > 1) {
       createFolderAndCopy(CAP_DIR, XSA_DIR, CONTAINER_NUM, paramArray, option);
     }

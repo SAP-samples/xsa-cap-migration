@@ -2,8 +2,8 @@ const shell = require("shelljs");
 const fsExtra = require("fs-extra");
 const fs = require('fs');
 
-const modifyHdiNamespace = require("./modifyHdiNamespace");
-const convertHdbcdsToCds = require("./convertHdbcdsToCds");
+const {modifyHdiNamespace} = require("./modifyHdiNamespace");
+const {convertHdbcdsToCds} = require("./convertHdbcdsToCds");
 const calViewModification = require("./calViewModification");
 const changeDataTypes = require("./changeDataTypes");
 const formatRoleandTabledata = require("./formatRoleAndTabledata");
@@ -13,6 +13,7 @@ const processFolder = require("./processFolder");
 const {
   replaceSimpleUsingInFiles,
   replaceUsingInFiles,
+  replacePatternsInFiles,
 } = require("./replaceFiles");
 const structuredPrivilege = require("./structuredPrivilege");
 const removeSeriesFunction = require("./removeSeriesFunction");
@@ -25,10 +26,11 @@ const {
 } = require("./annotationChanges");
 const updateSchema = require("./updateSchema");
 const findFiles = require("./findFiles");
-const convertHdbtableToCds = require("./convertHdbtableToCds");
-const convertHdbviewToCds = require("./convertHdbviewToCds");
+const {convertHdbtableToCds} = require("./convertHdbtableToCds");
 const inlineConfig = require("./inlineConfig");
-const formatcds = require("../formatCds")
+const formatcds = require("../formatCds");
+const {convertCalcviewToCds} = require("./convertCalcviewToCds");
+const {convertHdbfunctionToCds} = require("./convertHdbfunctionToCds");
 
 const setup_db = async (source, destination, option) => {
   try {
@@ -39,14 +41,18 @@ const setup_db = async (source, destination, option) => {
     modifyHdiNamespace(destination);
     console.log("Convert hdbcds to cds");
     convertHdbcdsToCds(".", ".hdbcds", ".cds");
-    console.log("Comment or remove the deprecated functionalities");
-    removeDeprecated();
-    console.log("format cds files")
-    formatcds(destination)
     console.log("Convert hdbtable to cds");
     convertHdbtableToCds(".", ".hdbtable")
-    // console.log("Convert hdbviews to cds");
-    // convertHdbviewToCds(".", ".hdbview")
+    console.log("modify cds file replacePatternsInFiles ");
+    replacePatternsInFiles(".")
+    console.log("Convert hdbfunction to cds");
+    convertHdbfunctionToCds(".", ".hdbfunction")
+    console.log("Convert hdbcalculationview to cds");
+    await convertCalcviewToCds(".", ".hdbcalculationview")
+    console.log("Comment or remove the deprecated functionalities");
+    // removeDeprecated();
+    console.log("format cds files")
+    formatcds(destination)
     console.log("Using Calculation Views Modification");
     calViewModification();
     console.log("Modify the view notation");
@@ -148,7 +154,7 @@ const replaceOdata = () => {
 const moveToDB = () => {
   shell
     .find(".")
-    .filter((file) => file.endsWith(".cds"))
+    .filter((file) => file.endsWith(".cds")  && !file.includes('cds/'))
     .forEach((file) => {
       shell.mv(file, ".");
     });

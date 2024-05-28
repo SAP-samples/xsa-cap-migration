@@ -13,11 +13,13 @@ const formatSynonymConfig = (directory) => {
           file.endsWith(".hdbsynonymtemplate")
       );
     for (const file of files) {
-      let data = fs1.readFileSync(file, "utf8");
-      const jsonData = JSON.parse(data);
-      const transformedData = transformSynonym(jsonData);
-      let outputFileContent = JSON.stringify(transformedData, null, 4);
-      fs1.writeFileSync(file, outputFileContent, "utf8");
+      if(file !== "src/Proxy_Table.hdbsynonym"){
+        let data = fs1.readFileSync(file, "utf8");
+        const jsonData = JSON.parse(data);
+        const transformedData = transformSynonym(jsonData);
+        let outputFileContent = JSON.stringify(transformedData, null, 4);
+        fs1.writeFileSync(file, outputFileContent, "utf8");
+      }
     }
     console.log("The files are Successfully Transformed");
   } catch (error) {

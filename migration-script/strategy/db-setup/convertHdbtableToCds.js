@@ -1,5 +1,16 @@
-const fs1 = require("fs");
+const {writeFileSync,readFileSync} = require("fs");
 const shell = require("shelljs");
+const  {format} = require('sql-formatter')
+
+
+let reportHdbtableFiles = []
+let reportCdsFiles = []
+let reportSynonymFile = []
+
+
+const reportHdbtableToCds = () =>{
+  return {reportHdbtableFiles,reportCdsFiles,reportSynonymFile}
+}
 
 const convertHdbtableToCds = (directory, extension) => {
   try {
@@ -7,19 +18,24 @@ const convertHdbtableToCds = (directory, extension) => {
     let proxyCdsArray = []
     let proxySynonymArray = []
     files.forEach(file => {
-      let data = fs1.readFileSync(file, "utf8");
+      reportHdbtableFiles.push(file.split('/').pop())
+      let data = readFileSync(file, "utf8");
       let { newFileContent, planeColumnQuotedTable} = convertToCds(data);
       if(newFileContent) proxyCdsArray.push(newFileContent);
       if(planeColumnQuotedTable) proxySynonymArray.push(planeColumnQuotedTable);
     });
-    if(proxyCdsArray.length > 0) fs1.writeFileSync('Proxy_Table.cds',proxyCdsArray.join("\n\n"));
+    if(proxyCdsArray.length > 0){ 
+      writeFileSync('Proxy_Table.cds', proxyCdsArray.join('\n\n'))
+      reportCdsFiles.push("Proxy_Table.cds")
+    }
     if(proxySynonymArray.length > 0) { 
       let jsonString = proxySynonymArray.join(",\n"); 
       let result = '{\n' + jsonString + '\n}';      
-      fs1.writeFileSync('src/Proxy_Table.hdbsynonym', result); 
+      writeFileSync('src/Proxy_Table.hdbsynonym', result); 
+      reportSynonymFile.push("Proxy_Table.hdbsynonym")
   }
   } catch (error) {
-    console.error(`Error: ${error}`);
+    console.error(`Error converting Hdbtable to cds: ${error}`);
   }
 };
 
@@ -32,17 +48,15 @@ const isValidManyJoinLine = (line) => {
 }
 
 const convertSqlToAssociation = (sqlString) => {
-  //MAKE SURE LINE HAS JOING CONDITION
   if(isValidManyJoinLine(sqlString)){
     let associations  = sqlString.trim().replace(/\)\)+WITH ASSOCIATIONS \((?=\s*MANY)/, "").replace(/\),$/g, ")").replace(/\(/g, "").replace(/\)/g, "").split(/\s*,\s*JOIN\s+/);
     return associations.map((line) => {
-      // SPLITING LINE BASED ON ALIAS AND JOINING OPERATOR
       let asIndex = line.indexOf(' AS ');
       let onIndex = line.indexOf(' ON ');
       
-      let table = line.substring(line.indexOf('JOIN') + 4, asIndex).trim().toUpperCase();
-      let alias = line.substring(asIndex + 3, onIndex).trim().toUpperCase();
-      let rightId = line.substring(onIndex+ 3).trim().toUpperCase();       
+      let table = line.substring(line.indexOf('JOIN') + 4, asIndex).trim().replace(/\./g, '_').replace(/::/g, '_').replace(/"/g, '').toUpperCase();
+      let alias = line.substring(asIndex + 3, onIndex).trim().replace(/"/g, '').toUpperCase();
+      let rightId = line.substring(onIndex+ 3).trim().replace(/"/g, '').replace(/,/g, '').toUpperCase();       
       let associationType = line.includes("MANY TO MANY JOIN") ? "Association to many" : "Association to";
  
       return `${alias} : ${associationType} ${table} on ${rightId};`;    
@@ -50,7 +64,6 @@ const convertSqlToAssociation = (sqlString) => {
   }else if(isValidJoinLine(sqlString)){
       let associations = sqlString.trim().replace(/^WITH ASSOCIATIONS\(\s*JOIN\s+/, "").replace(/\)\s*$/, "").split(/\s*,\s*JOIN\s+/);
       return associations.map((line)=>{
-          //SPLITING LINE BASED ON ALIAS AND JOINING OPERATOR
           let asIndex = line.indexOf("AS");
           let onIndex = line.indexOf("ON");
           let equalsIndex = line.indexOf("=");
@@ -70,9 +83,9 @@ const convertSqlToAssociation = (sqlString) => {
 const dataTypesCleanUp = (type) =>{
   if (type.includes('(') && type.includes(')')) {
     return type; 
-} else {
+  } else {
     return type.split('(')[0].replace(',', ''); 
-}
+  }
 }
  
 const convertDbTypes = (types) => {
@@ -90,13 +103,16 @@ const convertDbTypes = (types) => {
       case types.startsWith('ST_POINT'):
         return `hana.ST_POINT(${match[1].trim()})`;
       case types.startsWith('ST_GEOMETRY'):
-          return `hana.ST_GEOMETRY(${match[1].trim()})`;
+        return `hana.ST_GEOMETRY(${match[1].trim()})`;
     }
   }
   switch (types) {
+    case 'BOOLEAN':
+      return 'Boolean';
     case 'DECIMAL':
-      return 'DecimalFloat';
+      return 'Decimal';
     case 'NVARCHAR':
+    case 'STRING' :
       return 'String';
     case 'INTEGER':
     case 'INT':
@@ -114,7 +130,7 @@ const convertDbTypes = (types) => {
     case 'REAL':
       return 'hana.REAL'
     case 'DOUBLE':
-      return 'BinaryFloat';
+      return 'Double';
     case 'CHAR':
     case 'NCHAR':
     case 'VARCHAR':
@@ -128,14 +144,13 @@ const convertDbTypes = (types) => {
     case 'TIMESTAMP':
     case 'LONGDATE':
     case 'SECONDDATE':
-      return 'UTCDateTime';
+      return 'Timestamp';
     case 'NCLOB':
      return 'LargeString'
     case 'BLOB':
       return 'LargeBinary'
-    case 'DAYDATE':
     case 'DATE':
-      return 'LocalDate'
+      return 'Date'
     case 'SMALLDECIMAL':
       return 'hana.SMALLDECIMAL'
     case 'VARBINARY':
@@ -145,8 +160,7 @@ const convertDbTypes = (types) => {
     case 'BINARY':
       return 'hana.BINARY'
     case 'TIME':
-    case 'SECONDTIME':
-      return 'LocalTime'
+      return 'Time';
     case 'CLOB':
       return 'hana.CLOB'
     case 'ST_POINT':
@@ -159,45 +173,70 @@ const convertDbTypes = (types) => {
 }
 
 const convertToHdbsynonym = (tableName) =>{
-    return `"${tableName.toUpperCase() .replace(/"/g, '').replace(/\./g, '_').replace(/::/g, '_')}" : {
+    return `"${tableName.toUpperCase().replace(/"/g, '').replace(/\./g, '_').replace(/::/g, '_')}" : {
       "target": {
         "object" : ${tableName}
       }
     }`
 }
 
+const splitLines = (data) =>{
+  return data.split('\n').filter((line) => line.trim() !== '');
+}
+
+const formatTableStatement = (sqlStatement) => {
+  let formatted = sqlStatement.replace(/\(/, '(\n');
+  formatted = formatted.replace(/,\s(?!\w+\s*\[)/, ',\n  ');
+  formatted = formatted.replace(/\)(?!\w+\s*\[)/, '\n)');
+  return formatted;
+}
+
+
+const checkIfNumberAndBracket = (matches) =>{
+  let matchesType = matches[1]
+  const typeLengthBrackets = /\(\d+\)/g;
+  const rightBracket = /\d+\)/;
+  const leftBracket = /\(\d+/;
+  if(matches[2] !== undefined){
+    if(matches[2].match(typeLengthBrackets)) {
+      return matchesType + matches[2]
+    }else if(matches[2].match(rightBracket)){
+      return matchesType + matches[2]
+    }else if(matches[3] !== undefined && matches[2].match(leftBracket) && matches[3].match(rightBracket))
+    return matchesType + matches[2] + matches[3]
+  }
+  return matchesType
+}
+
 const convertToCds = (data) =>{
 
-  const sqlDataTypes = ['NVARCHAR','SHORTTEXT','REAL','ALPHANUM','DECIMAL','SMALLDECIMAL','SECONDTIME','DAYDATE','BINARY','VARBINARY','INTEGER','INT','TINYINT','SMALLINT','MEDIUMINT','BIGINT','NUMERIC','FLOAT','DOUBLE','NCHAR','CHAR','VARCHAR','TEXT','DATE','TIME','DATETIME','LONGDATE','TIMESTAMP','SECONDDATE','NCLOB','BLOB','ST_POINT','ST_GEOMETRY','CLOB'];
-  const lines = data.split('\n').filter((line) => line.trim() !== ''); 
-  let entityName = lines[0].replace(/column table /ig, '').trim().replace(' (', '').toUpperCase();
+  const sqlDataTypes = ['NVARCHAR','STRING','BOOLEAN','SHORTTEXT','REAL','ALPHANUM','DECIMAL','SMALLDECIMAL','DAYDATE','BINARY','VARBINARY','INTEGER','INT','TINYINT','SMALLINT','MEDIUMINT','BIGINT','NUMERIC','FLOAT','DOUBLE','NCHAR','CHAR','VARCHAR','TEXT','DATE','TIME','DATETIME','LONGDATE','TIMESTAMP','SECONDDATE','NCLOB','BLOB','ST_POINT','ST_GEOMETRY','CLOB'];
+  let lines = splitLines(format(data, {language: 'postgresql'}))
+  if(lines.length == 1){
+    lines = splitLines(formatTableStatement(data))
+  }
+  let entityName = lines[0].replace(/column table /ig, '').trim().replace(' (', '')
   let tableName = entityName;
-  entityName = entityName.replace(/"/g, '').replace(/\./g, '_').replace(/::/g, '_');
+  entityName = entityName.replace(/"/g, '').replace(/\./g, '_').replace(/::/g, '_').toUpperCase();;
 
-  //MAPING KEYS 
   let keyNamesArray = [];
   if (data.includes('PRIMARY KEY')) {
     let match = data.match(/PRIMARY KEY\s*\(\s*([^)]+?)\s*\)\s*\)/s);
     if (match && match[1]) {
       let keys = match[1].split(',');
-      keyNamesArray = keys.map(key => key.trim().replace(/['"]/g, '').replace(/\./g, '_'));
+      keyNamesArray = keys.map(key => key.trim().replace(/['"]/g, '').replace(/\./g, '_').toUpperCase());
     } 
   }
 
   const columns = [];
-  const columnsForViews = []
   for (let i = 1; i < lines.length ; i++) {
-    //EXCLUDING COMMENTS
     const columnLine = lines[i].trim().replace(/COMMENT.*$/, '');
     if(columnLine !== ""){
-      //SPLITING NAMES AND TYPES
       let matches = columnLine.split(" ").filter(Boolean);
-      //CHECKING ONLY DATATYPES BEFORE MAPING
       if(matches.length > 1 && sqlDataTypes.includes(dataTypesCleanUp(matches[1]).split('(')[0].replace(/['"]+/g, '').toUpperCase().trim())){
-        columnsForViews.push(matches[0].replace(/\)+/, '').trim())
         let name = matches[0].replace(/"/g, '').replace(/\)+/, '').trim().replace(/\./g, '_').toUpperCase();
+        let matchesType = checkIfNumberAndBracket(matches)
         if (name !== "COMMENT") {
-          //OPTIMIZATION BY POPING MAPPED KEYS IN STACK
             for(let j=0;j<keyNamesArray.length;j++){
               if (name === keyNamesArray[j]) {
                 name = `key ${name}`;
@@ -205,12 +244,15 @@ const convertToCds = (data) =>{
                 break
               }
             }
-          const type = convertDbTypes(matches[1].toUpperCase());
+          const type = convertDbTypes(matchesType.toUpperCase());
           columns.push({name, type});
         }
       }
     }
   }
+
+  let isEntityQuoted = tableName.includes('"')
+  let planeColumnQuotedTable = isEntityQuoted ? convertToHdbsynonym(tableName) : undefined;
 
   let associationDetails = [];
   if(data.includes("ASSOCIATIONS") && data.includes("JOIN")){
@@ -222,23 +264,7 @@ const convertToCds = (data) =>{
       }
     })
   }
-  //CHECK 3 DIFFERENT CASES
-  let isEntityQuoted = tableName.includes('"')
-  let columnQuote = false;
-  if(isEntityQuoted){
-    for(let i =1; i < lines.length; i++){
-      const columnLine = lines[i].trim().replace(/COMMENT.*$/, '');
-      if(columnLine !== ""){
-        let matches = columnLine.split(" ").filter(Boolean);
-        if(matches.length > 1 && sqlDataTypes.includes(dataTypesCleanUp(matches[1]).split('(')[0].replace(/['"]+/g, '').toUpperCase().trim())){
-          columnQuote = matches[0].includes('"')
-          break
-        }
-      }
-    }
-  }
-  let planeColumnQuotedTable = isEntityQuoted ? convertToHdbsynonym(tableName) : undefined;
-  
+ 
   const newFileContent = [
     `@cds.persistence.exists`,
     `Entity ${entityName} {`,
@@ -253,4 +279,4 @@ const convertToCds = (data) =>{
   }
 }
 
-module.exports = convertHdbtableToCds;
+module.exports = {convertHdbtableToCds,convertDbTypes,reportHdbtableToCds,dataTypesCleanUp,convertToHdbsynonym,convertSqlToAssociation};
