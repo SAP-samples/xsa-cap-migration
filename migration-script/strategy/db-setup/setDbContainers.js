@@ -4,7 +4,7 @@ const fs1 = require("fs");
 const { execSync } = require("child_process");
 const path = require("path");
 
-const setup_db_containers = (
+ const setup_db_containers = (
   CAP_DIR,
   XSA_DIR,
   CONTAINER_NUM,

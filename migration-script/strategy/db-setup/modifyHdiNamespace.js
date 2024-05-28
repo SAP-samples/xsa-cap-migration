@@ -28,4 +28,4 @@ const modifyHdiNamespace = (destination) => {
   }
 };
 
-module.exports = modifyHdiNamespace;
+module.exports = {modifyHdiNamespace};
