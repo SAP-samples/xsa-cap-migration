@@ -1,10 +1,10 @@
 const fs1 = require("fs");
 const path = require("path");
-const {find} = require("shelljs")
+
 const processFolder = (directory) => {
   try {
-    const files = find(directory).filter((file) => file.endsWith('.cds'));
-    for (const file of files) {
+    const files = fs1.readdirSync(directory);
+    for (file of files) {
       if (path.extname(file) === ".cds") {
         createhdbtabletype(path.join(directory, file));
         checkAndDeleteFile(path.join(directory, file));
