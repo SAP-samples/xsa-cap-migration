@@ -10,7 +10,6 @@ const compileAndRedirect = require("./strategy/compileAndRedirect");
 const formatcds = require("./strategy/formatCds");
 const technicalConfig = require("./strategy/db-setup/technicalConfig");
 const addDeployFormat = require("./strategy/addDeployFormat");
-const { hanaDbConnection, disconnectConnection } = require("./config/hanaDbConnection");
 
 const main = async () => {
   try {
@@ -24,9 +23,8 @@ const main = async () => {
     APPNAME = process.env.APP;
     option = process.env.option || 0;
     if (option == 3) technicalConfig(CAP_DIR, option);
-    await hanaDbConnection();
     setup_cap_project(CAP_DIR);
-    await setup_db_containers(CAP_DIR, XSA_DIR, CONTAINER_NUM, paramArray, option);
+    setup_db_containers(CAP_DIR, XSA_DIR, CONTAINER_NUM, paramArray, option);
     mtaandxsuaa(CAP_DIR);
     setup_app(CAP_DIR, XSA_DIR, APPNAME);
     odataV2Support(CAP_DIR);
@@ -35,7 +33,6 @@ const main = async () => {
     callcalculation(CURR_DIR, CAP_DIR);
     //compileAndRedirect(CAP_DIR);
     formatcds(CAP_DIR);
-    await disconnectConnection();
   } catch (error) {
     console.error(`Error: ${error}`);
   }
