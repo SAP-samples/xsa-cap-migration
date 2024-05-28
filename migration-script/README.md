@@ -11,7 +11,7 @@ The Automated script is used to migrate applications from HANA CDS to CAP CDS. I
 
 - Converting the file extensions from "hdbcds" files into "cds" for CAP compliance.
   
-- As part of the transition to CAP compliant format, the notation in view definitions should be modified from "" to ![]. This specific delimiter enhances the reliability of processing in CAP CDS.
+- As part of the transition to CAP compliant format, the notation in view definitions should be modified from "" to ![]. This specific [delimiter](https://cap.cloud.sap/docs/cds/cdl#delimited-identifiers) enhances the reliability of processing in CAP CDS.
   
 - Coverts HANA CDS Datatypes to CAP CDS Datatypes.
        | HANA CDS | CAP CDS |
@@ -90,7 +90,12 @@ The Automated script is used to migrate applications from HANA CDS to CAP CDS. I
    ```
 3. Install the required node modules by running the command `npm install`.
 4. Execute the script by running the command `npm run start`.
-5. Once the script is running, provide the below parameters to execute the script
+5. Once the script is running, provide the parameters to execute the script.
+6. Select migration path as:
+ - `option 1` to migrate an XSA application to CAP application.
+- `option 2` to migrate a XSC application to CAP application.
+- `option 3` to migrate the files from hdbcds format to hdbtable format in a CAP Application.
+
 ![parameters](./images/parameters.png)
 
 ## Note:
