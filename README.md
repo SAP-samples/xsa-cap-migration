@@ -57,7 +57,7 @@ SHINE follows the XS Advanced Programming Model(XSA) and uses SAP HANA Service f
 We have successfully migrated the SHINE sample application and content in order to identify the challenges and issues that customers have encountered in doing a migration from SAP HANA 2.0 to SAP HANA Cloud. The path followed for this Migration involves the below steps: 
 1. [Preparing XS Advanced Source and CAP Target Applications](https://github.com/SAP-samples/xsa-cap-migration/blob/main/README.md#step-1-preparing-xs-advanced-source-and-cap-target-applications)
 2. [Rename the HANA Artifacts in the Source SAP HANA 2.0/XSA HDI Container](https://github.com/SAP-samples/xsa-cap-migration/blob/main/README.md#step-2-rename-the-hana-artifacts-in-the-source-sap-hana-20xsa-hdi-container).
-3. [CAP Application Deployment with hdbcds and hdbtable format to the Source SAP HANA 2.0/XSA HDI Container](https://github.com/SAP-samples/xsa-cap-migration/blob/main/README.md#step-3-cap-application-deployment-with-hdbcds-and-hdbtable-format-to-the-source-sap-hana-20xsa-hdi-container).
+3. [CAP Application Deployment with hdbtable format to the Source SAP HANA 2.0/XSA HDI Container](https://github.com/SAP-samples/xsa-cap-migration/blob/main/README.md#step-3-cap-application-deployment-with-hdbtable-format-to-the-source-sap-hana-20xsa-hdi-container).
 4. [Migration of SAP HANA 2.0 HDI Container using Self-Service Migration for SAP HANA Cloud and Bind the CAP application to the migrated container](https://github.com/SAP-samples/xsa-cap-migration/blob/main/README.md#step-4-migration-of-sap-hana-20-hdi-container-using-self-service-migration-for-sap-hana-cloud-and-connect-the-cap-application-to-the-migrated-container).
 5. [Migration of SRV and UI layers](https://github.com/SAP-samples/xsa-cap-migration/blob/main/README.md#step-5-migration-of-srv-and-ui-layers).
 
@@ -286,38 +286,9 @@ As CAP expects unquoted identifiers with `.` replaced by `_`, we have to perform
 
   **Note:** The modified artifacts for the example SHINE Application can be accessed with the [link](https://github.com/SAP-samples/xsa-cap-migration/blob/main/examples/hdbcds/db/src).
 
-## Step-3: CAP Application Deployment with hdbcds and hdbtable format to the Source SAP HANA 2.0/XSA HDI Container.
-To retain the data in the container, we have to first deploy the CAP Application with the hdbcds format and then with hdbtable format.
-  ### 3.1: CAP Application Deployment with hdbcds format:
-  The hdbcds deployment will map the CAP entities to the existing entities in the SAP HANA 2.0 HDI container.
-  1. In the package.json file in the root folder of the CAP application, the deploy-format should be changed to "hdbcds" and kind as "hana" as below.
-     ```
-     "cds": {
-        "hana": {
-          "deploy-format": "hdbcds"
-        },
-        "requires": {
-          "db": {
-            "kind": "hana"
-          }
-        }
-     }
-     ```
-     **Note:** The migration script covers this part.
-  2. Next, we need to remove the rename procedure and the default_access_role as its no longer required. Delete the RENAME_HDBCDS_TO_PLAIN.hdbprocedure from the "procedures" folder and also delete the "defaults" folder. Add the path of these files in the undeploy.json file like this:
-     ```
-     [
-        "src/defaults/*",
-        "src/procedures/RENAME_HDBCDS_TO_PLAIN.hdbprocedure"
-     ]
-     ```
-  3. Build the CAP Application by running the command `cds build --production`. This will generate the database artifacts with the hdbcds format.
-  4. Deploy the CAP db module to the SAP HANA 2.0 HDI container. The deployment can be done either by using the [SAP HDI Deployer](https://www.npmjs.com/package/@sap/hdi-deploy) or by using the MTA.
-  
-  **Note:** The CAP db module of the example SHINE Application with hdbcds format can be accessed with the [link](https://github.com/SAP-samples/xsa-cap-migration/blob/main/examples/hdbcds/db)
-  
-  ### 3.2: CAP Application Deployment with hdbtable format:
-  As Hana Cloud doesn't support hdbcds format, The hdbtable deployment will convert the mapped entities to hdbtables which can then be migrated to the Hana Cloud.
+## Step-3: CAP Application Deployment with hdbtable format to the Source SAP HANA 2.0/XSA HDI Container.
+We have to deploy the CAP Application with the hdbtable format.
+
   1. In the package.json file in the root folder of the CAP application, the deploy-format should be changed to "hdbtable".
      ```
      "cds": {
@@ -335,7 +306,15 @@ To retain the data in the container, we have to first deploy the CAP Application
      Once the script is running, provide the below parameters to execute the script.
 ![parameters](./migration-script/images/parameters_optionThree.png)
 
-  2. Change the Calculated field to a [Stored calculated element](https://cap.cloud.sap/docs/releases/jun23#calculated-elements-on-write) as below example
+  2. Next, we need to remove the rename procedure and the default_access_role as its no longer required. Delete the RENAME_HDBCDS_TO_PLAIN.hdbprocedure from the "procedures" folder and also delete the "defaults" folder. Add the path of these files in the undeploy.json file like this:
+     ```
+     [
+        "src/defaults/*",
+        "src/procedures/RENAME_HDBCDS_TO_PLAIN.hdbprocedure"
+     ]
+     ```
+
+  3. Change the Calculated field to a [Stored calculated element](https://cap.cloud.sap/docs/releases/jun23#calculated-elements-on-write) as below example
      ```
      Entity Employees {
         key  ID: Integer;
@@ -347,7 +326,7 @@ To retain the data in the container, we have to first deploy the CAP Application
      };
      ```
      **Note:**  Stored calculated element is supported from cds version 7 onwards.
-  3. Modify the `@sql.append` annotations above the entity to remove the technical configuration blocks.
+  4. Modify the `@sql.append` annotations above the entity to remove the technical configuration blocks.
     
      Eg:
      ```
@@ -355,14 +334,6 @@ To retain the data in the container, we have to first deploy the CAP Application
      Entity BusinessPartner {}
      ```
      **Note:** Technical configurations of Row store: Since we are converting the temporary table to table, by default it will be stored as a column table so we can remove the row store. Technical configurations of Column store: Its default so it can also be removed.
-  4. Open the undeploy.json file in the db folder and update it to undeploy all the hdbcds database artifacts and replace them with .hdbtable database artifacts like this:
-
-     ```
-     [
-        "src/gen/*.hdbcds"
-     ]
-     ```
-
   5. Build the CAP Application by running the command `cds build --production`. This will generate the db artifacts with the hdbtable format.
   6. Deploy the CAP db module to the SAP HANA 2.0 HDI container. The deployment can be done either by using the [SAP HDI Deployer](https://www.npmjs.com/package/@sap/hdi-deploy) or by using the MTA.
   
