@@ -425,6 +425,7 @@ Migrate the SRV and the UI layer of the XSA Application to CAP.
 10. [Fiori Elements](https://sapui5.hana.ondemand.com/sdk/#/topic/03265b0408e2432c9571d6b3feb6b1fd).
 11. [Partition a table in HANA Deployment Infrastructure(HDI)](https://blogs.sap.com/2022/01/11/partition-a-table-in-hana-deployment-infrastructurehdi/)
 12. [Deploy Your Multi-Target Application (MTA)](https://developers.sap.com/tutorials/btp-app-cap-mta-deployment.html)
+13. [Migration of SAP HANA XS Advanced To SAP Cloud Application Programming Model Using SAP HANA Application Migration](https://github.com/SAP-samples/xsa-cap-migration-using-basextn)
 
 ## How to obtain support
 [Create an issue](https://github.com/SAP-samples/xsa-cap-migration/issues) in this repository if you find a bug or have questions about the content.
