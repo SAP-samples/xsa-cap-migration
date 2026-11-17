@@ -61,10 +61,10 @@ module.exports = function() {
 						jobid = results[0].NJOBID;
 						timestamp = new Date().toISOString();
 						//create job
-						var query = "INSERT INTO \"Jobs.Data\" VALUES('" + jobid.toString() + "','" + jname + "','" + timestamp + "')";
+						var query = 'INSERT INTO "Jobs.Data" VALUES(?,?,?)';
 						db.preparePromisified(query)
 						.then(statement => {
-							db.statementExecPromisified(statement, [])
+							db.statementExecPromisified(statement, [jobid, jname, timestamp])
 							.then(results => {
 								console.log("++++ Record inserted .....");
 								res.status(200).json({status: 'record inserted into shine'});
