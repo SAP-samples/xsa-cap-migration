@@ -285,10 +285,10 @@ module.exports = function() {
 						util.callback(error, res, 'Error deleteing new job ');
 						logger.error('Error occured' + error);
 					}else{
-						var query = 'DELETE FROM "Jobs.ScheduleDetails" WHERE JOBID=' + jobId;
+						var query = 'DELETE FROM "Jobs.ScheduleDetails" WHERE JOBID=?';
 						db.preparePromisified(query)
 						.then(statement => {
-							db.statementExecPromisified(statement, [])
+							db.statementExecPromisified(statement, [jobId])
 							.then(rows => {
 								res.writeHead(200, {
 									'Content-Type': 'application/json'

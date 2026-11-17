@@ -8,7 +8,12 @@ try {
     var polygonString = 'NEW ST_Point(LATITUDE, LONGITUDE).ST_Within( NEW ST_Polygon(\'Polygon((';
     // var polygonString = 'NEW ST_Point(LATITUDE, LONGITUDE).ST_Within( NEW ST_Polygon(\'Polygon((';
     for (i; i < polygon.points.length; i++) {
-        polygonString += polygon.points[i].lat + ' ' + polygon.points[i].long;
+        var lat = polygon.points[i].lat;
+        var lon = polygon.points[i].long;
+        if (typeof lat !== 'number' || typeof lon !== 'number' || !isFinite(lat) || !isFinite(lon)) {
+            throw new Error('Invalid polygon coordinates');
+        }
+        polygonString += lat + ' ' + lon;
         if (i !== polygon.points.length - 1) {
             polygonString += ',';
         }

@@ -11,7 +11,10 @@ async function my_create_after_exit(param) {
             LastName = rs.getString(3);
             Email = rs.getString(4);
         }
-        pStmt = await param.connection.prepareStatement("insert into \"UserData.User\" values('"+FirstName+"','"+LastName+"','"+Email+"')");
+        pStmt = await param.connection.prepareStatement('insert into "UserData.User" values(?,?,?)');
+        pStmt.setString(1, FirstName);
+        pStmt.setString(2, LastName);
+        pStmt.setString(3, Email);
         await pStmt.executeUpdate();
         await pStmt.close();
         console.log(FirstName);
@@ -35,7 +38,8 @@ async function my_delete_after_exit(param) {
             UserId = rs.getInteger(1);
         }
 		console.log(UserId);
-        pStmt = await param.connection.prepareStatement('delete from "UserData.User" where "UserId"='+UserId);
+        pStmt = await param.connection.prepareStatement('delete from "UserData.User" where "UserId"=?');
+        pStmt.setInteger(1, UserId);
         await pStmt.executeUpdate();
         await pStmt.close();
     } catch (e) {
@@ -60,7 +64,11 @@ async function my_update_after_exit(param) {
         }
 		console.log(UserId);
 		console.log(FirstName);
-        pStmt = await param.connection.prepareStatement('update "UserData.User" set "FirstName"=\''+FirstName+'\',"LastName"=\''+LastName+'\',"Email"=\''+Email+'\' where "UserId"='+UserId);
+        pStmt = await param.connection.prepareStatement('update "UserData.User" set "FirstName"=?,"LastName"=?,"Email"=? where "UserId"=?');
+        pStmt.setString(1, FirstName);
+        pStmt.setString(2, LastName);
+        pStmt.setString(3, Email);
+        pStmt.setInteger(4, UserId);
         await pStmt.executeUpdate();
         await pStmt.close();
     } catch (e) {
