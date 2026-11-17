@@ -47,7 +47,7 @@ async function getFilter(req, BusinessPartners, Products, PO_POHEADER) {
         )
       }
       try {
-        const CITY = await cds.run(`SELECT CITY FROM GET_BUYER_CITY('${ req.data.query }')`);
+        const CITY = await cds.run('SELECT CITY FROM GET_BUYER_CITY(?)', [req.data.query]);
         CITY.forEach(item => {
           list.push(createFilterEntry(item.CITY, 'City', 'businessPartner'));
         });
