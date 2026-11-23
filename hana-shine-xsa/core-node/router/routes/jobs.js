@@ -220,11 +220,11 @@ module.exports = function() {
 		const dbClass = require(global.__base + "utils/dbPromises");
 		let db = new dbClass(req.db);
 		
-		var query = 'SELECT "ID","NAME", "TIMESTAMP" FROM "Jobs.Data" WHERE NAME = "'+name+'"';
-		
+		var query = 'SELECT "ID","NAME", "TIMESTAMP" FROM "Jobs.Data" WHERE NAME = ?';
+
 		db.preparePromisified(query)
 		.then(statement => {
-			db.statementExecPromisified(statement, [])
+			db.statementExecPromisified(statement, [name])
 			.then(rows => {
 				for (var i in rows) {
 					jobObj = {
